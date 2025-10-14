@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/12 00:32:35 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/10/14 21:15:38 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/10/14 21:34:13 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ void	freelst(t_token *head)
 {
 	t_token	*temp;
 
+	
 	while (head)
 	{
 		temp = head;
