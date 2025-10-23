@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/12 00:32:35 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/10/18 18:19:16 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/10/20 00:05:48 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,6 +189,8 @@ void	check_n_creat_tokens(t_token **head)
 		if (tmp->next != NULL)
 			tmp = tmp->next;
 	}
+	//create a rearrange function to handle cases such as :
+	// ls > infile.txt -la
 }
 
 // void	parse_cmd(t_token **head)

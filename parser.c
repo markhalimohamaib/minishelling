@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 18:51:06 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/10/18 18:17:53 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/10/20 01:11:23 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,9 +73,22 @@ static void	print_ast_recursive(t_node *node, int depth)
 			}
 		}
 		printf("\n");
+	}
+	else if (node->type == REDIR_NODE)
+	{
+		printf("├─ REDIR: ");
+		if (node->redir_type == T_REDIR_OUT)
+			printf("> %s\n", node->filename);
+		else if (node->redir_type == T_REDIR_IN)
+			printf("< %s\n", node->filename);
+		else if (node->redir_type == T_REDIR_APPEND)
+			printf(">> %s\n", node->filename);
+		else if (node->redir_type == T_HEREDOC)
+			printf("<< %s\n", node->filename);
 		
-		if (node->redirs)
-			print_redirs(node->redirs, depth + 1);
+		print_indent(depth);
+		printf("│  Left:\n");
+		print_ast_recursive(node->left, depth + 2);
 	}
 	else if (node->type == PIPE_NODE)
 	{
@@ -124,6 +137,19 @@ void	print_ast_compact(t_node *node)
 		print_ast_compact(node->right);
 		printf(")");
 	}
+	else if (node->type == REDIR_NODE)
+	{
+		if (node->redir_type == T_REDIR_OUT)
+			printf("(> %s ", node->filename);
+		else if (node->redir_type == T_REDIR_IN)
+			printf("(< %s ", node->filename);
+		else if (node->redir_type == T_REDIR_APPEND)
+			printf("(>> %s ", node->filename);
+		else if (node->redir_type == T_HEREDOC)
+			printf("(<< %s ", node->filename);
+		print_ast_compact(node->left);
+		printf(")");
+	}
 	else if (node->type == CMD_NODE)
 	{
 		printf("[");
@@ -138,8 +164,6 @@ void	print_ast_compact(t_node *node)
 				i++;
 			}
 		}
-		if (node->redirs)
-			printf(" +redirs");
 		printf("]");
 	}
 }
@@ -148,7 +172,6 @@ void	print_ast_compact(t_node *node)
 
 void	print_node(t_node *node)
 {
-	t_token	*redir;
 	int		i;
 
 	if (!node)
@@ -163,9 +186,12 @@ void	print_node(t_node *node)
 		printf("CMD\n");
 	else if (node->type == PIPE_NODE)
 		printf("PIPE\n");
+	else if (node->type == REDIR_NODE)
+		printf("REDIR\n");
 	else
 		printf("UNKNOWN\n");
 
+	// Print command array (CMD_NODE only)
 	if (node->cmd)
 	{
 		printf("cmd: ");
@@ -180,28 +206,47 @@ void	print_node(t_node *node)
 	else
 		printf("cmd: (none)\n");
 
-	redir = node->redirs;
-	if (redir)
+	// Print redirection info (REDIR_NODE only)
+	if (node->type == REDIR_NODE)
 	{
-		printf("redirections:\n");
-		while (redir)
-		{
-			if (redir->type == T_REDIR_OUT)
-				printf("  >  %s\n", redir->filename);
-			else if (redir->type == T_REDIR_IN)
-				printf("  <  %s\n", redir->filename);
-			else if (redir->type == T_REDIR_APPEND)
-				printf("  >> %s\n", redir->filename);
-			else if (redir->type == T_HEREDOC)
-				printf("  << %s\n", redir->heredoc_del);
-			redir = redir->next;
-		}
+		printf("redir: ");
+		if (node->redir_type == T_REDIR_OUT)
+			printf(">  %s\n", node->filename);
+		else if (node->redir_type == T_REDIR_IN)
+			printf("<  %s\n", node->filename);
+		else if (node->redir_type == T_REDIR_APPEND)
+			printf(">> %s\n", node->filename);
+		else if (node->redir_type == T_HEREDOC)
+			printf("<< %s\n", node->filename);
 	}
-	else
-		printf("redirections: none\n");
+	else if (node->filename)
+		printf("filename: %s\n", node->filename);
 
-	printf("left:  %p\n", (void *)node->left);
-	printf("right: %p\n", (void *)node->right);
+	// Print tree pointers
+	printf("left:  %p", (void *)node->left);
+	if (node->left)
+	{
+		if (node->left->type == CMD_NODE)
+			printf(" (CMD)");
+		else if (node->left->type == PIPE_NODE)
+			printf(" (PIPE)");
+		else if (node->left->type == REDIR_NODE)
+			printf(" (REDIR)");
+	}
+	printf("\n");
+
+	printf("right: %p", (void *)node->right);
+	if (node->right)
+	{
+		if (node->right->type == CMD_NODE)
+			printf(" (CMD)");
+		else if (node->right->type == PIPE_NODE)
+			printf(" (PIPE)");
+		else if (node->right->type == REDIR_NODE)
+			printf(" (REDIR)");
+	}
+	printf("\n");
+	
 	printf("===============\n");
 }
 
@@ -249,47 +294,47 @@ char	**create_cmd_from_tokens(t_token **head)
 	return (cmd);
 }
 
-t_token	*copy_redir(t_token *tmp)
-{
-	t_token	*redir;
+// t_token	*copy_redir(t_token *tmp)
+// {
+// 	t_token	*redir;
 	
-	redir = malloc(sizeof(t_token));
-	redir->type = tmp->type;
-	redir->next = NULL;
-	if(tmp->filename)
-		redir->filename = ft_strdup(tmp->filename);
-	else
-		redir->filename = NULL;
-	if(tmp->value)
-		redir->value = ft_strdup(tmp->value);
-	else
-		redir->value = NULL;
-	if(tmp->heredoc_del)
-		redir->heredoc_del = ft_strdup(tmp->heredoc_del);
-	else
-		redir->heredoc_del = NULL;
-	return (redir);
-}
+// 	redir = malloc(sizeof(t_token));
+// 	redir->type = tmp->type;
+// 	redir->next = NULL;
+// 	if(tmp->filename)
+// 		redir->filename = ft_strdup(tmp->filename);
+// 	else
+// 		redir->filename = NULL;
+// 	if(tmp->value)
+// 		redir->value = ft_strdup(tmp->value);
+// 	else
+// 		redir->value = NULL;
+// 	if(tmp->heredoc_del)
+// 		redir->heredoc_del = ft_strdup(tmp->heredoc_del);
+// 	else
+// 		redir->heredoc_del = NULL;
+// 	return (redir);
+// }
 
-t_token	*get_redir(t_token **head)
-{
-	t_token	*tmp;
-	t_token	*redir;
+// t_token	*get_redir(t_token **head)
+// {
+// 	t_token	*tmp;
+// 	t_token	*redir;
 	
-	tmp = (*head);
-	while(tmp && tmp->type != T_PIPE)
-	{
-		if (tmp->type == T_REDIR_IN || tmp->type == T_REDIR_OUT ||
-			tmp->type == T_REDIR_APPEND || tmp->type == T_HEREDOC)
-		{
-			// tmp = malloc(sizeof(t_token));
-			redir = copy_redir(tmp);
-			return(redir);		
-		}
-		tmp = tmp->next;	
-	}
-	return (NULL);
-}
+// 	tmp = (*head);
+// 	while(tmp && tmp->type != T_PIPE)
+// 	{
+// 		if (tmp->type == T_REDIR_IN || tmp->type == T_REDIR_OUT ||
+// 			tmp->type == T_REDIR_APPEND || tmp->type == T_HEREDOC)
+// 		{
+// 			// tmp = malloc(sizeof(t_token));
+// 			redir = copy_redir(tmp);
+// 			return(redir);		
+// 		}
+// 		tmp = tmp->next;	
+// 	}
+// 	return (NULL);
+// }
 
 t_node	*create_nodes(t_token **head, char **cmd)
 {
@@ -298,9 +343,23 @@ t_node	*create_nodes(t_token **head, char **cmd)
 	node = malloc(sizeof(t_node));
 	node->type = CMD_NODE;
 	node->cmd = cmd;
-	node->redirs = get_redir(head);
+	// node->redirs = get_redir(head);
 	node->right = NULL;
 	node->left = NULL;
+	return (node);
+}
+
+t_node	*create_redir_node(token_type type, char *filename, t_node *left)
+{
+	t_node	*node;
+
+	node = malloc(sizeof(t_node));
+	node->type = REDIR_NODE;
+	node->cmd = NULL;
+	node->filename = ft_strdup(filename);
+	node->redir_type = type;
+	node->left = left;
+	node->right = NULL;
 	return (node);
 }
 
@@ -308,6 +367,34 @@ void	skip_to_pipe(t_token **head)
 {
 	while (*head && (*head)->type != T_PIPE)
 		*head = (*head)->next;
+}
+
+t_node	*parse_smpl_cmd(t_token **head)
+{
+	char	**cmd;
+	t_node	*node;
+	t_node	*redir_node;
+	t_token	*tmp;
+
+	tmp = (*head);
+	cmd = create_cmd_from_tokens(head);
+	node = create_nodes(head, cmd);
+	while (tmp && tmp->type != T_PIPE)
+	{
+		if (tmp->type == T_REDIR_IN || tmp->type == T_REDIR_OUT ||
+			tmp->type == T_REDIR_APPEND || tmp->type == T_HEREDOC)
+		{
+			if (tmp->filename)
+				redir_node = create_redir_node(tmp->type, tmp->filename, node);
+			else if (tmp->heredoc_del)
+				redir_node = create_redir_node(tmp->type, tmp->heredoc_del, node);
+			else
+				redir_node = create_redir_node(tmp->type, "", node);
+			node = redir_node;
+		}
+		tmp = tmp->next;
+	}
+	return (node);
 }
 
 // t_node	*create_pipe_node(t_node *node, t_token **head)
@@ -332,17 +419,17 @@ void	skip_to_pipe(t_token **head)
 // 	return (node);
 // }
 
-t_node	*build_ast(t_token **head)
-{
-	t_node	*pipe_node;
-	t_token	*tmp;
+// t_node	*build_ast(t_token **head)
+// {
+// 	t_node	*pipe_node;
+// 	t_token	*tmp;
 
 	
-}
+// }
 
 t_node	*parse_cmd(t_token **head)
 {
-	char	**command;
+	// char	**command;
 	t_node	*pipe_node;
 	t_node	*node;
 	t_token	*tmp;
@@ -357,8 +444,8 @@ t_node	*parse_cmd(t_token **head)
 	// if (tmp->type == T_REDIR_IN || tmp->type == T_REDIR_OUT ||
 	// 	tmp->type == T_REDIR_APPEND || tmp->type == T_HEREDOC)
 	// 	redir = tmp;
-	command = create_cmd_from_tokens(head);
-	node = create_nodes(head, command);
+	// command = create_cmd_from_tokens(head);
+	node = parse_smpl_cmd(head);
 	print_node(node);
 	skip_to_pipe(head);
 	if ((*head) && (*head)->type == T_PIPE)
@@ -368,9 +455,9 @@ t_node	*parse_cmd(t_token **head)
 		pipe_node = malloc(sizeof(t_node));
 		pipe_node->type = PIPE_NODE;
 		pipe_node->left = node;
-		pipe_node->right = parse_cmd(head);
-		pipe_node->redirs = NULL;
+		// pipe_node->redirs = NULL;
 		pipe_node->cmd = NULL;
+		pipe_node->right = parse_cmd(head);
 		print_node(pipe_node);
 		return (pipe_node);
 	}
