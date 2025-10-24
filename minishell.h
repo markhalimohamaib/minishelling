@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/10/23 22:40:14 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/10/24 17:23:29 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,17 @@
 #include <readline/readline.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+typedef struct s_gc_node
+{
+	void				*ptr;
+	struct s_gc_node	*next;
+}	t_gc_node;
+
+typedef struct s_gc
+{
+	t_gc_node	*list;
+}	t_gc;
 
 typedef enum
 {
@@ -62,3 +73,6 @@ typedef struct s_node
 //parser.c
 t_node	*parse_cmd(t_token **head);
 void	print_ast(t_node *root);
+void	gc_init(t_gc *gc);
+void	*gc_malloc(t_gc *gc, size_t size);
+void	gc_free_all(t_gc *gc);
