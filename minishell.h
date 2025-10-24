@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/10/14 21:02:20 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/10/23 22:40:14 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ typedef enum
 {
 	CMD_NODE,
 	PIPE_NODE,
-	REDIR_NODE
+	REDIR_NODE,
+	EOF_NODE
 }					node_type;
 
 typedef struct s_token
@@ -50,8 +51,14 @@ typedef struct s_node
 	node_type		type;
 	//for cmd
 	char			**cmd;
-	t_token			*token;
+	char			*filename;
+	// t_token			*redirs;
+	token_type		redir_type;
 	//for pipe
 	struct s_node	*left;
 	struct s_node	*right;
 }					t_node;
+
+//parser.c
+t_node	*parse_cmd(t_token **head);
+void	print_ast(t_node *root);
