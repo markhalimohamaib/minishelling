@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/10/14 21:02:20 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/10/24 17:13:34 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,17 @@
 #include <readline/readline.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+typedef struct s_gc_node
+{
+	void				*ptr;
+	struct s_gc_node	*next;
+}	t_gc_node;
+
+typedef struct s_gc
+{
+	t_gc_node	*list;
+}	t_gc;
 
 typedef enum
 {
@@ -55,3 +66,8 @@ typedef struct s_node
 	struct s_node	*left;
 	struct s_node	*right;
 }					t_node;
+
+
+void	gc_init(t_gc *gc);
+void	*gc_malloc(t_gc *gc, size_t size);
+void	gc_free_all(t_gc *gc);
