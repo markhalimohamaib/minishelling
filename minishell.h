@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/10/24 17:23:29 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/10/27 20:26:15 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,8 @@ typedef struct s_token
 {
 	token_type		type;
 	char			*value;
-	// int				quoted;
-	// int				expand;
+	int				quoted;
+	int				expand;
 	char			*filename;
 	char			*heredoc_del;
 	struct s_token	*next;
@@ -69,6 +69,8 @@ typedef struct s_node
 	struct s_node	*left;
 	struct s_node	*right;
 }					t_node;
+
+// void print_token_list(t_token *head);
 
 //parser.c
 t_node	*parse_cmd(t_token **head);

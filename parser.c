@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 18:51:06 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/10/23 22:41:31 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/10/26 23:41:33 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,7 +180,7 @@ void	print_node(t_node *node)
 		return;
 	}
 
-	printf("=== NODE ===\n");
+	printf("==== NODE ====\n");
 	printf("Type: ");
 	if (node->type == CMD_NODE)
 		printf("CMD\n");
