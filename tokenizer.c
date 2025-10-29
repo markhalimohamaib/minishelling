@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 17:05:06 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/10/28 21:56:54 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/10/29 20:44:01 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,53 +83,73 @@ void	print_token_list(t_token *head)
 
 // ---------------------------------------------------------------------------------
 
-int	quo_word_len(char *str, int i)
-{
-	int	count;
-	int	end;
+// int	quo_word_len(char *str, int i)
+// {
+// 	int	count;
+// 	int	end;
 
-	// int	quotes;
-	count = 0;
-	// quotes = 0;
-	// while (str[i] != ' ' || str[i] == '\t')
-	// 	i++;
-	if (str[i] == '\'')
-	{
-		count++;
-		i++;
-		while (str[i] != '\'')
-		{
-			i++;
-			count++;
-		}
-		return (count + 1);
-	}
-	else if (str[i] == '\"')
-	{
-		count++;
-		i++;
-		while (str[i] != '\"')
-		{
-			i++;
-			count++;
-		}
-		return (count + 1);
-	}
-	return (count + 1);
-}
+// 	// int	quotes;
+// 	count = 0;
+// 	// quotes = 0;
+// 	// while (str[i] != ' ' || str[i] == '\t')
+// 	// 	i++;
+// 	if (str[i] == '\'')
+// 	{
+// 		count++;
+// 		i++;
+// 		while (str[i] != '\'')
+// 		{
+// 			i++;
+// 			count++;
+// 		}
+// 		return (count + 1);
+// 	}
+// 	else if (str[i] == '\"')
+// 	{
+// 		count++;
+// 		i++;
+// 		while (str[i] != '\"')
+// 		{
+// 			i++;
+// 			count++;
+// 		}
+// 		return (count + 1);
+// 	}
+// 	return (count + 1);
+// }
 
 int	word_len(char *str, int i)
 {
-	int	count;
+	int		count;
+	char	quote;
 
 	count = 0;
 	while (str[i] == ' ' || str[i] == '\t')
 		i++;
 	while (str[i] != ' ' && str[i] != '\t' && str[i] != '|' && str[i] != '>'
-		&& str[i] != '<' && str[i] != '\'' && str[i] != '\"')
+		&& str[i] != '<')
 	{
-		count++;
-		i++;
+		if (str[i] == '\'' || str[i] == '\"')
+		{
+			quote = str[i];
+			count++;
+			i++;
+			while(str[i] && str[i] != quote)
+			{
+				count++;
+				i++;
+			}
+			if(str[i] == quote)
+			{
+				count++;
+				i++;
+			}
+		}
+		else
+		{
+			count++;
+			i++;
+		}
 	}
 	return (count);
 }
@@ -139,13 +159,14 @@ char	*check_for_fname(token_type type, int *i, char *str)
 	int		size;
 	int		j;
 	char	*filename;
+	char	quote;
 
 	j = 0;
-	// size = word_len(str, (*i));
-	if (str[(*i)] == '\'' || str[(*i)] == '\"')
-		size = quo_word_len(str, (*i));
-	else
-		size = word_len(str, (*i));
+	size = word_len(str, (*i));
+	// if (str[(*i)] == '\'' || str[(*i)] == '\"')
+	// 	size = quo_word_len(str, (*i));
+	// else
+	// 	size = word_len(str, (*i));
 	if (type == T_REDIR_IN || type == T_REDIR_OUT || type == T_REDIR_APPEND)
 	{
 		while (str[(*i)] == ' ' || str[(*i)] == '\t')
@@ -153,9 +174,31 @@ char	*check_for_fname(token_type type, int *i, char *str)
 		filename = malloc(sizeof(char) * (size + 1));
 		while (j < size && str[(*i)])
 		{
-			filename[j] = str[(*i)];
-			j++;
-			(*i)++;
+			if (str[(*i)] == '\'' || str[(*i)] == '\"')
+			{
+				quote = str[(*i)];
+				filename[j] = str[(*i)];
+				j++;
+				(*i)++;
+				while(str[(*i)] && str[(*i)] != quote)
+				{
+					filename[j] = str[(*i)];
+					j++;
+					(*i)++;
+				}
+				if(str[(*i)] == quote)
+				{
+					filename[j] = str[(*i)];
+					j++;
+					(*i)++;
+				}
+			}
+			else
+			{
+				filename[j] = str[(*i)];
+				j++;
+				(*i)++;
+			}
 		}
 		filename[j] = '\0';
 		return (filename);
@@ -169,13 +212,14 @@ char	*check_for_heredoc(token_type type, int *i, char *str)
 	int		size;
 	int		j;
 	char	*heredoc;
+	char	quote;
 
 	j = 0;
-	// size = word_len(str, (*i));
-	if (str[(*i)] == '\'' || str[(*i)] == '\"')
-		size = quo_word_len(str, (*i));
-	else
-		size = word_len(str, (*i));
+	size = word_len(str, (*i));
+	// if (str[(*i)] == '\'' || str[(*i)] == '\"')
+	// 	size = quo_word_len(str, (*i));
+	// else
+	// 	size = word_len(str, (*i));
 	if (type == T_HEREDOC)
 	{
 		while (str[(*i)] == ' ' || str[(*i)] == '\t')
@@ -183,9 +227,31 @@ char	*check_for_heredoc(token_type type, int *i, char *str)
 		heredoc = malloc(sizeof(char) * (size + 1));
 		while (j < size && str[(*i)])
 		{
+			if (str[(*i)] == '\'' || str[(*i)] == '\"')
+			{
+				quote = str[(*i)];
+				heredoc[j] = str[(*i)];
+				j++;
+				(*i)++;
+				while(str[(*i)] && str[(*i)] != quote)
+				{
+					heredoc[j] = str[(*i)];
+					j++;
+					(*i)++;
+				}
+				if(str[(*i)] == quote)
+				{
+					heredoc[j] = str[(*i)];
+					j++;
+					(*i)++;
+				}
+			}
+			else
+			{
 			heredoc[j] = str[(*i)];
 			j++;
 			(*i)++;
+			}
 		}
 		heredoc[j] = '\0';
 		return (heredoc);
@@ -248,26 +314,26 @@ void	add_to_list(t_token **head, token_type type, char *value, int *i,
 // 	}
 // }
 
-char	*extract_word(char *word, int *i)
-{
-	int		start;
-	int		end;
-	int		state;
-	char	**extracted;
+// char	*extract_word(char *word, int *i)
+// {
+// 	int		start;
+// 	int		end;
+// 	int		state;
+// 	char	**extracted;
 
-	start = 0;
-	end = 0;
-	state = 0;
-	while(word[start])
-	{
-		if(word[start] == '\'')
-			state = 1;
-		else if(word[start] == '\"')
-			state = 2;
-		while(state == 1 && word[start] == '\'')
-			end++;
-	}
-}
+// 	start = 0;
+// 	end = 0;
+// 	state = 0;
+// 	while(word[start])
+// 	{
+// 		if(word[start] == '\'')
+// 			state = 1;
+// 		else if(word[start] == '\"')
+// 			state = 2;
+// 		while(state == 1 && word[start] == '\'')
+// 			end++;
+// 	}
+// }
 
 int	is_space(char c)
 {
@@ -386,21 +452,44 @@ void	handle_operator(char *str, t_token **head, int *i)
 void	handle_quotes(char *str, t_token **head, int *i)
 {
 	char	*quoted_word;
-	char	*extracted;
+	// char	*extracted;
+	char	quote;
 	int		j;
 	int		size;
 
 	j = 0;
-	size = quo_word_len(str, (*i));
+	size = word_len(str, (*i));
 	quoted_word = malloc(sizeof(char) * (size + 1));
-	while (j <= size && str[(*i)])
+	while (j < size && str[(*i)])
 	{
+		if(str[(*i)] == '\'' || str[(*i)] == '\"')
+		{
+			quote = str[(*i)];
+			quoted_word[j] = str[(*i)];
+			j++;
+			(*i)++;
+			while(str[(*i)] && str[(*i)] != quote)
+			{
+				quoted_word[j] = str[(*i)];
+				j++;
+				(*i)++;
+			}
+			if(str[(*i)] == quote)
+			{
+				quoted_word[j] = str[(*i)];
+				j++;
+				(*i)++;
+			}
+		}
+		else
+		{
 		quoted_word[j] = str[(*i)];
 		(*i)++;
 		j++;
+		}
 	}
 	quoted_word[j] = '\0';
-	extracted = extarct_word(quoted_word, i);
+	// extracted = extarct_word(quoted_word, i);
 	add_to_list(head, T_WORD, quoted_word, i, str);
 }
 
