@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 18:51:06 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/10/30 23:28:47 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/10/30 23:33:36 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -345,7 +345,7 @@ t_node	*parse_smpl_cmd(t_token **head, t_gc *gc)
 	while (last_redir)
 	{
 		node = check_type(last_redir, node, gc);
-		last_redir->type = T_WORD;
+		last_redir->type = T_EOF;
 		last_redir = find_last_redir(start);
 	}
 	while (start && start->type != T_PIPE)
