@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 18:51:06 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/10/26 23:41:33 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/10/30 22:25:30 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -369,33 +369,277 @@ void	skip_to_pipe(t_token **head)
 		*head = (*head)->next;
 }
 
-t_node	*parse_smpl_cmd(t_token **head)
-{
-	char	**cmd;
-	t_node	*node;
-	t_node	*redir_node;
-	t_token	*tmp;
+// Attach a redirection to a command node
 
-	tmp = (*head);
-	cmd = create_cmd_from_tokens(head);
-	node = create_nodes(head, cmd);
+
+// t_node	*parse_smpl_cmd(t_token **head)
+// {
+// 	char	**cmd;
+// 	t_node	*cmd_node;
+// 	t_node	*first_redir;
+// 	t_node	*last_redir;
+// 	t_node	*redir_node;
+// 	t_token	*tmp;
+
+// 	tmp = (*head);
+// 	cmd = create_cmd_from_tokens(head);
+// 	cmd_node = create_nodes(head, cmd);
+// 	first_redir = NULL;
+// 	last_redir = NULL;
+// 	while (tmp && tmp->type != T_PIPE)
+// 	{
+// 		if (tmp->type == T_REDIR_IN || tmp->type == T_REDIR_OUT ||
+// 			tmp->type == T_REDIR_APPEND || tmp->type == T_HEREDOC)
+// 		{
+// 			if (tmp->filename)
+// 				redir_node = create_redir_node(tmp->type, tmp->filename, cmd_node);
+// 			else if (tmp->heredoc_del)
+// 				redir_node = create_redir_node(tmp->type, tmp->heredoc_del, cmd_node);
+// 			else
+// 				redir_node = create_redir_node(tmp->type, "", cmd_node);
+			
+// 			if (!first_redir)
+// 				first_redir = redir_node;
+// 			if (last_redir)
+// 				last_redir->right = redir_node;
+// 			last_redir = redir_node;
+// 		}
+// 		tmp = tmp->next;
+// 	}
+// 	*head = tmp;
+// 	if (first_redir)
+// 		return (first_redir);
+// 	return (cmd_node);
+// }
+
+// int	get_redir_count(t_token **head)
+// {
+// 	int		count;
+// 	t_token	*tmp;	
+
+// 	tmp = (*head);
+// 	count = 0;
+// 	while(tmp && tmp->type != T_PIPE)
+// 	{
+// 		if (tmp->type == T_REDIR_IN || tmp->type == T_REDIR_OUT
+// 			|| tmp->type == T_REDIR_APPEND || tmp->type == T_HEREDOC)
+// 			count++;
+// 		tmp = tmp->next;
+// 	}
+// 	return (count);
+// }
+
+// void	update_tmp_pos(t_redirs_data *data, t_token **head)
+// {
+// 	data->tmp = data->tmp2;
+// 	while (data->tmp && data->tmp->type != T_PIPE)
+// 		data->tmp = data->tmp->next;
+// 	(*head) = data->tmp;
+// }
+
+// void	init_redir_data(t_redirs_data *data, t_token **head)
+// {
+// 	data->i = 0;
+// 	data->tmp = (*head);
+// 	data->tmp2 = (*head);
+// 	data->cmd = create_cmd_from_tokens(head);
+// 	data->node = create_nodes(head, data->cmd);
+// 	data->count = get_redir_count(head);
+// }
+
+// t_node	*parse_smpl_cmd(t_token **head, t_redirs_data *data)
+// {
+// 	t_token			**redir_pos;
+
+// 	init_redir_data(data, head);
+// 	redir_pos = malloc(sizeof(t_token *) * data->count);
+// 	while(data->i < data->count && data->tmp && data->tmp->type != T_PIPE)
+// 	{
+// 		if (data->tmp->type == T_REDIR_IN || data->tmp->type == T_REDIR_OUT 
+// 			|| data->tmp->type == T_REDIR_APPEND || data->tmp->type == T_HEREDOC)
+// 			redir_pos[data->i++] = data->tmp;
+// 		data->tmp = data->tmp->next;
+// 	}
+// 	data->i -= 1;
+// 	while (data->i >= 0)
+// 	{
+// 		if (redir_pos[data->i]->filename)
+// 			data->redir_node = create_redir_node(redir_pos[data->i]->type
+// 				, redir_pos[data->i]->filename, data->node);
+// 		else if (redir_pos[data->i]->heredoc_del)
+// 			data->redir_node = create_redir_node(redir_pos[data->i]->type
+// 				, redir_pos[data->i]->heredoc_del, data->node);
+// 		data->node = data->redir_node;
+// 		data->i--;
+// 	}
+// 	update_tmp_pos(data, head);
+// 	return (data->node);
+// }
+
+t_token	*find_last_redir(t_token *start)
+{
+	t_token	*tmp;
+	t_token	*last_redir;
+
+	tmp = start;
+	last_redir = NULL;
 	while (tmp && tmp->type != T_PIPE)
 	{
-		if (tmp->type == T_REDIR_IN || tmp->type == T_REDIR_OUT ||
-			tmp->type == T_REDIR_APPEND || tmp->type == T_HEREDOC)
-		{
-			if (tmp->filename)
-				redir_node = create_redir_node(tmp->type, tmp->filename, node);
-			else if (tmp->heredoc_del)
-				redir_node = create_redir_node(tmp->type, tmp->heredoc_del, node);
-			else
-				redir_node = create_redir_node(tmp->type, "", node);
-			node = redir_node;
-		}
+		if (tmp->type == T_REDIR_IN || tmp->type == T_REDIR_OUT
+			|| tmp->type == T_REDIR_APPEND || tmp->type == T_HEREDOC)
+			last_redir = tmp;
 		tmp = tmp->next;
 	}
+	return (last_redir);
+}
+
+t_node	*check_type(t_token *redir, t_node *node)
+{
+	if (redir->filename)
+		return (create_redir_node(redir->type, redir->filename, node));
+	else if (redir->heredoc_del)
+		return (create_redir_node(redir->type, redir->heredoc_del, node));
+	else
+		return (create_redir_node(redir->type, "", node));
+}
+
+t_node	*parse_smpl_cmd(t_token **head)
+{
+	t_node	*node;
+	t_token	*start;
+	t_token	*last_redir;
+
+	start = (*head);
+	node = create_nodes(head, create_cmd_from_tokens(head));
+	last_redir = find_last_redir(start);
+	while (last_redir)
+	{
+		node = check_type(last_redir, node);
+		last_redir->type = T_WORD;
+		last_redir = find_last_redir(start);
+	}
+	while (start && start->type != T_PIPE)
+		start = start->next;
+	*head = start;
 	return (node);
 }
+
+// t_node	*parse_smpl_cmd(t_token **head)
+// {
+// 	int		i;
+// 	int		count;
+// 	char	**cmd;
+// 	t_node	*node;
+// 	t_node	*redir_node;
+// 	t_token	*redir_pos[count];
+// 	t_token	*tmp;
+// 	t_token	*tmp2;
+
+// 	i = 0;
+// 	tmp = (*head);
+// 	tmp2 = (*head);
+// 	cmd = create_cmd_from_tokens(head);
+// 	node = create_nodes(head, cmd);
+// 	count = get_redir_count(head);
+// 	while(i < count && tmp && tmp->type != T_PIPE)
+// 	{
+// 		if (tmp->type == T_REDIR_IN || tmp->type == T_REDIR_OUT 
+// 			|| tmp->type == T_REDIR_APPEND || tmp->type == T_HEREDOC)
+// 		{
+// 			redir_pos[i] = tmp;
+// 			i++;
+// 		}
+// 		tmp = tmp->next;
+// 	}
+// 	i -= 1;
+// 	while (i >= 0)
+// 	{
+// 		if (redir_pos[i]->filename)
+// 			redir_node = create_redir_node(redir_pos[i]->type, redir_pos[i]->filename, node);
+// 		else if (redir_pos[i]->heredoc_del)
+// 			redir_node = create_redir_node(redir_pos[i]->type, redir_pos[i]->heredoc_del, node);
+// 		node = redir_node;
+// 		i--;
+// 	}
+// 	tmp = tmp2;
+// 	while (tmp && tmp->type != T_PIPE)
+// 		tmp = tmp->next;
+// 	*head = tmp;
+// 	return (node);
+// }
+
+// t_node	*parse_smpl_cmd(t_token **head)
+// {
+// 	char	**cmd;
+// 	t_node	*node;
+// 	t_node	*redir_node;
+// 	t_token	*tmp;
+// 	t_token	*start;
+// 	t_token	*redirs[100];
+// 	int		i;
+// 	int		count;
+
+// 	start = (*head);
+// 	cmd = create_cmd_from_tokens(head);
+// 	node = create_nodes(head, cmd);
+// 	tmp = start;
+// 	count = 0;
+// 	while (tmp && tmp->type != T_PIPE)
+// 	{
+// 		if (tmp->type == T_REDIR_IN || tmp->type == T_REDIR_OUT ||
+// 			tmp->type == T_REDIR_APPEND || tmp->type == T_HEREDOC)
+// 		{
+// 			redirs[count] = tmp;
+// 			count++;
+// 		}
+// 		tmp = tmp->next;
+// 	}
+// 	i = count - 1;
+// 	while (i >= 0)
+// 	{
+// 		if (redirs[i]->filename)
+// 			redir_node = create_redir_node(redirs[i]->type, redirs[i]->filename, node);
+// 		else if (redirs[i]->heredoc_del)
+// 			redir_node = create_redir_node(redirs[i]->type, redirs[i]->heredoc_del, node);
+// 		else
+// 			redir_node = create_redir_node(redirs[i]->type, "", node);
+// 		node = redir_node;
+// 		i--;
+// 	}
+// 	tmp = start;
+// 	while (tmp && tmp->type != T_PIPE)
+// 		tmp = tmp->next;
+// 	*head = tmp;
+// 	return (node);
+// }
+
+// t_node	*parse_smpl_cmd(t_token **head)
+// {
+// 	char	**cmd;
+// 	t_node	*node;
+// 	t_node	*redir_node;
+// 	t_token	*tmp;
+
+// 	tmp = (*head);
+// 	cmd = create_cmd_from_tokens(head);
+// 	node = create_nodes(head, cmd);
+// 	while (tmp && tmp->type != T_PIPE)
+// 	{
+// 		if (tmp->type == T_REDIR_IN || tmp->type == T_REDIR_OUT ||
+// 			tmp->type == T_REDIR_APPEND || tmp->type == T_HEREDOC)
+// 		{
+// 			if (tmp->filename)
+// 				redir_node = create_redir_node(tmp->type, tmp->filename, node);
+// 			else if (tmp->heredoc_del)
+// 				redir_node = create_redir_node(tmp->type, tmp->heredoc_del, node);
+// 			else
+// 				redir_node = create_redir_node(tmp->type, "", node);
+// 			node = redir_node;
+// 		}
+// 		tmp = tmp->next;
+// 	}
+// 	return (node);
+// }
 
 // t_node	*create_pipe_node(t_node *node, t_token **head)
 // {
@@ -430,9 +674,10 @@ t_node	*parse_smpl_cmd(t_token **head)
 t_node	*parse_cmd(t_token **head)
 {
 	// char	**command;
-	t_node	*pipe_node;
-	t_node	*node;
-	t_token	*tmp;
+	t_node			*pipe_node;
+	t_node			*node;
+	t_token			*tmp;
+	// t_redirs_data	*data;
 	// t_token	*redir;
 
 	if ((*head)->type == T_PIPE)
@@ -445,6 +690,12 @@ t_node	*parse_cmd(t_token **head)
 	// 	tmp->type == T_REDIR_APPEND || tmp->type == T_HEREDOC)
 	// 	redir = tmp;
 	// command = create_cmd_from_tokens(head);
+
+	// in this step we need data like : 
+	// 		first pipe position 
+	// 		first redirection position
+	// data = NULL;
+	// init_redir_data(data, head);
 	node = parse_smpl_cmd(head);
 	print_node(node);
 	skip_to_pipe(head);

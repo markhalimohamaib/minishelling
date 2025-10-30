@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   gc_utils.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 15:29:28 by markhali          #+#    #+#             */
-/*   Updated: 2025/10/24 17:14:05 by markhali         ###   ########.fr       */
+/*   Updated: 2025/10/30 23:05:41 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	gc_init(t_gc *gc)
 	gc->list = NULL;
 }
 
-void	*gc_malloc(t_gc *gc, size_t size)
+void	*gc_malloc(size_t size, t_gc *gc)
 {
 	void		*ptr;
 	t_gc_node	*node;
@@ -51,4 +51,22 @@ void	gc_free_all(t_gc *gc)
 		cur = next;
 	}
 	gc->list = NULL;
+}
+
+char	*gc_ft_strdup(const char *str, t_gc *gc)
+{
+	char	*dup;
+	int		i;
+
+	i = 0;
+	dup = gc_malloc((sizeof (char) * (ft_strlen(str) + 1)), gc);
+	if (!dup)
+		return (0);
+	while (str[i])
+	{
+		dup[i] = str[i];
+		i++;
+	}
+	dup[i] = '\0';
+	return (dup);
 }
