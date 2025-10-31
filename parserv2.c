@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 18:51:06 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/10/30 23:33:36 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/10/31 00:12:15 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -323,7 +323,7 @@ t_token	*find_last_redir(t_token *start)
 	return (last_redir);
 }
 
-t_node	*check_type(t_token *redir, t_node *node, t_gc *gc)
+t_node	*wrap_redirs(t_token *redir, t_node *node, t_gc *gc)
 {
 	if (redir->filename)
 		return (create_redir_node(redir->type, redir->filename, node, gc));
@@ -336,21 +336,21 @@ t_node	*check_type(t_token *redir, t_node *node, t_gc *gc)
 t_node	*parse_smpl_cmd(t_token **head, t_gc *gc)
 {
 	t_node	*node;
-	t_token	*start;
+	t_token	*tmp;
 	t_token	*last_redir;
 
-	start = (*head);
+	tmp = (*head);
 	node = create_nodes(head, create_cmd_from_tokens(head, gc), gc);
-	last_redir = find_last_redir(start);
+	last_redir = find_last_redir(tmp);
 	while (last_redir)
 	{
-		node = check_type(last_redir, node, gc);
+		node = wrap_redirs(last_redir, node, gc);
 		last_redir->type = T_EOF;
-		last_redir = find_last_redir(start);
+		last_redir = find_last_redir(tmp);
 	}
-	while (start && start->type != T_PIPE)
-		start = start->next;
-	*head = start;
+	while (tmp && tmp->type != T_PIPE)
+		tmp = tmp->next;
+	*head = tmp;
 	return (node);
 }
 
