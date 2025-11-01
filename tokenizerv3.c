@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tokenizerv2.c                                      :+:      :+:    :+:   */
+/*   tokenizerv3.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 17:05:06 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/01 17:35:34 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/11/01 19:54:40 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,10 +59,10 @@ void	print_token_list(t_token *head)
 	{
 		printf("[%02d] %-12s | value = \"%s\"", i, token_type_str(cur->type),
 			cur->value ? cur->value : "");
-		// if (cur->quoted)
-		//     printf(" | quoted=%d", cur->quoted);
-		// if (cur->expand)
-		//     printf(" | expands=%d", cur->expand);
+		if (cur->state)
+		    printf(" | state=%d", cur->state);
+		if (cur->expand)
+		    printf(" | expands=%d", cur->expand);
 		if (cur->filename)
 			printf(" | filename = %s", cur->filename);
 		if (cur->heredoc_del)
@@ -210,6 +210,78 @@ char	*check_for_heredoc(token_type type, int *i, char *str, t_gc *gc)
 		return (NULL);
 }
 
+void	get_state(t_token *node, int size, t_gc *gc)
+{
+	int			i;
+	int			j;
+	char		*extracted;
+
+	j = 0;
+	i = 0;
+	extracted = gc_malloc(sizeof(char) * (size + 1), gc);
+	while(node->value[i])
+	{
+		if (node->state == NORMAL)
+		{
+			if (node->value[i] == '\'')
+				node->state = IN_SINGLE;
+			else if (node->value[i] == '\"')
+				node->state = IN_DOUBLE;
+			else if (node->value[i] == '$')
+			{
+				extracted[j++] = node->value[i];
+				node->expand = 1;
+			}
+			else
+				extracted[j++] = node->value[i];
+		}
+		else if (node->state == IN_SINGLE)
+		{
+			if (node->value[i] == '$')
+				extracted[j++] = node->value[i];
+			else if (node->value[i] == '\'')
+				node->state = NORMAL;
+			else
+				extracted[j++] = node->value[i];
+		}
+		else if (node->state == IN_DOUBLE)
+		{
+			if (node->value[i] == '$')
+			{
+				extracted[j++] = node->value[i];
+				node->expand = 1;
+			}
+			else if (node->value[i] == '\"')
+				node->state = NORMAL;
+			else
+				extracted[j++] = node->value[i];
+		}
+		i++;
+	}
+	extracted[j++] = '\0';
+	node->value = extracted;
+}
+
+// void	extract_word(t_token **head)
+// {
+// 	// char	*extracted;
+// 	char	quote;
+// 	int		i;
+// 	// int		state;
+// 	t_token	*tmp;
+
+// 	tmp = (*head);
+// 	i = 0;
+// 	// state = 0;
+// 	while(tmp->next)
+// 		tmp = tmp->next;
+// 	tmp->state = get_state(tmp->value);
+// 	if(tmp->state == IN_SINGLE)
+// 		tmp->expand = 0;
+// 	else
+// 		tmp->expand = 1;
+// }
+
 void	add_to_list(t_token **head, token_type type, char *value, int *i,
 		char *str, t_gc *gc)
 {
@@ -219,6 +291,8 @@ void	add_to_list(t_token **head, token_type type, char *value, int *i,
 	new = gc_malloc(sizeof(t_token), gc);
 	new->type = type;
 	new->value = value;
+	new->state = NORMAL;
+	new->expand = 0;
 	new->filename = check_for_fname(new->type, i, str, gc);
 	new->heredoc_del = check_for_heredoc(new->type, i, str, gc);
 	new->next = NULL;
@@ -309,6 +383,7 @@ void	handle_quotes(char *str, t_token **head, int *i, t_gc *gc)
 	char	quote;
 	int		j;
 	int		size;
+	t_token	*tmp;
 
 	j = 0;
 	size = word_len(str, (*i));
@@ -343,6 +418,11 @@ void	handle_quotes(char *str, t_token **head, int *i, t_gc *gc)
 	}
 	quoted_word[j] = '\0';
 	add_to_list(head, T_WORD, quoted_word, i, str, gc);
+	tmp = (*head);
+	while(tmp && tmp->next)
+		tmp = tmp->next;
+	get_state(tmp, size, gc);
+	// extract_word(head);
 }
 
 void	handle_word(char *str, t_token **head, int *i, t_gc *gc)
@@ -350,7 +430,8 @@ void	handle_word(char *str, t_token **head, int *i, t_gc *gc)
 	char	*word;
 	int		j;
 	int		size;
-
+	t_token	*tmp;
+	
 	j = 0;
 	size = word_len(str, (*i));
 	if (size == 0)
@@ -364,6 +445,10 @@ void	handle_word(char *str, t_token **head, int *i, t_gc *gc)
 	}
 	word[j] = '\0';
 	add_to_list(head, T_WORD, word, i, str, gc);
+	tmp = (*head);
+	while (tmp && tmp->next)
+		tmp = tmp->next;
+	get_state(tmp, size, gc);
 }
 
 token_type	is_metachar(char c)

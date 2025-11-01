@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/10/30 23:30:46 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/11/01 18:01:57 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,11 +46,18 @@ typedef enum
 	EOF_NODE
 }					node_type;
 
+typedef enum
+{
+	NORMAL,
+	IN_SINGLE,
+	IN_DOUBLE
+}					token_state;
+
 typedef struct s_token
 {
 	token_type		type;
 	char			*value;
-	int				quoted;
+	int				state;
 	int				expand;
 	char			*filename;
 	char			*heredoc_del;
