@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 17:05:06 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/01 19:54:40 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/11/04 23:57:44 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,9 +60,11 @@ void	print_token_list(t_token *head)
 		printf("[%02d] %-12s | value = \"%s\"", i, token_type_str(cur->type),
 			cur->value ? cur->value : "");
 		if (cur->state)
-		    printf(" | state=%d", cur->state);
+			printf(" | state=%d", cur->state);
 		if (cur->expand)
-		    printf(" | expands=%d", cur->expand);
+			printf(" | expands=%d", cur->expand);
+		if (cur->expand_value && cur->expand_value[0] != '\0')
+			printf(" | expand_val=%s", cur->expand_value);
 		if (cur->filename)
 			printf(" | filename = %s", cur->filename);
 		if (cur->heredoc_del)
@@ -84,7 +86,7 @@ int	word_len(char *str, int i)
 	count = 0;
 	while (str[i] == ' ' || str[i] == '\t')
 		i++;
-	while (str[i] && str[i] != ' ' && str[i] != '\t' && str[i] != '|' 
+	while (str[i] && str[i] != ' ' && str[i] != '\t' && str[i] != '|'
 		&& str[i] != '>' && str[i] != '<')
 	{
 		if (str[i] == '\'' || str[i] == '\"')
@@ -112,155 +114,394 @@ int	word_len(char *str, int i)
 	return (count);
 }
 
-char	*check_for_fname(token_type type, int *i, char *str, t_gc *gc)
-{
-	int		size;
-	int		j;
-	char	*filename;
-	char	quote;
+// char	*check_for_fname(token_type type, int *i, char *str, t_gc *gc)
+// {
+// 	int		size;
+// 	int		j;
+// 	char	*filename;
+// 	char	quote;
 
+// 	j = 0;
+// 	size = word_len(str, (*i));
+// 	if (type == T_REDIR_IN || type == T_REDIR_OUT || type == T_REDIR_APPEND)
+// 	{
+// 		while (str[(*i)] == ' ' || str[(*i)] == '\t')
+// 			(*i)++;
+// 		filename = gc_malloc(sizeof(char) * (size + 1), gc);
+// 		while (j < size && str[(*i)])
+// 		{
+// 			if (str[(*i)] == '\'' || str[(*i)] == '\"')
+// 			{
+// 				quote = str[(*i)];
+// 				filename[j] = str[(*i)];
+// 				j++;
+// 				(*i)++;
+// 				while (str[(*i)] && str[(*i)] != quote)
+// 				{
+// 					filename[j] = str[(*i)];
+// 					j++;
+// 					(*i)++;
+// 				}
+// 				if (str[(*i)] == quote)
+// 				{
+// 					filename[j] = str[(*i)];
+// 					j++;
+// 					(*i)++;
+// 				}
+// 			}
+// 			else
+// 			{
+// 				filename[j] = str[(*i)];
+// 				j++;
+// 				(*i)++;
+// 			}
+// 		}
+// 		filename[j] = '\0';
+// 		return (filename);
+// 	}
+// 	else
+// 		return (NULL);
+// }
+
+// char	*check_for_heredoc(token_type type, int *i, char *str, t_gc *gc)
+// {
+// 	int		size;
+// 	int		j;
+// 	char	*heredoc;
+// 	char	quote;
+
+// 	j = 0;
+// 	size = word_len(str, (*i));
+// 	if (type == T_HEREDOC)
+// 	{
+// 		while (str[(*i)] == ' ' || str[(*i)] == '\t')
+// 			(*i)++;
+// 		heredoc = gc_malloc(sizeof(char) * (size + 1), gc);
+// 		while (j < size && str[(*i)])
+// 		{
+// 			if (str[(*i)] == '\'' || str[(*i)] == '\"')
+// 			{
+// 				quote = str[(*i)];
+// 				heredoc[j] = str[(*i)];
+// 				j++;
+// 				(*i)++;
+// 				while (str[(*i)] && str[(*i)] != quote)
+// 				{
+// 					heredoc[j] = str[(*i)];
+// 					j++;
+// 					(*i)++;
+// 				}
+// 				if (str[(*i)] == quote)
+// 				{
+// 					heredoc[j] = str[(*i)];
+// 					j++;
+// 					(*i)++;
+// 				}
+// 			}
+// 			else
+// 			{
+// 				heredoc[j] = str[(*i)];
+// 				j++;
+// 				(*i)++;
+// 			}
+// 		}
+// 		heredoc[j] = '\0';
+// 		return (heredoc);
+// 	}
+// 	else
+// 		return (NULL);
+// }
+
+char	*process_quotes_and_expand(t_token *node, char *str, int size, t_gc *gc)
+{
+	int		i;
+	int		j;
+	int		w;
+	char	*extracted;
+	char	*extrac_expan;
+	int		start_i;
+
+	if (!str)
+		return (NULL);
+	i = 0;
 	j = 0;
-	size = word_len(str, (*i));
-	if (type == T_REDIR_IN || type == T_REDIR_OUT || type == T_REDIR_APPEND)
+	w = 0;
+	node->state = NORMAL;
+	node->expand = 0;
+	extracted = gc_malloc(sizeof(char) * (size + 1), gc);
+	extrac_expan = gc_malloc(sizeof(char) * (size + 1), gc);
+	while (str[i])
 	{
-		while (str[(*i)] == ' ' || str[(*i)] == '\t')
-			(*i)++;
-		filename = gc_malloc(sizeof(char) * (size + 1), gc);
-		while (j < size && str[(*i)])
+		if (node->state == NORMAL)
 		{
-			if (str[(*i)] == '\'' || str[(*i)] == '\"')
+			if (str[i] == '\'')
 			{
-				quote = str[(*i)];
-				filename[j] = str[(*i)];
-				j++;
-				(*i)++;
-				while (str[(*i)] && str[(*i)] != quote)
+				node->state = IN_SINGLE;
+				i++;
+			}
+			else if (str[i] == '\"')
+			{
+				node->state = IN_DOUBLE;
+				i++;
+			}
+			else if (str[i] == '$')
+			{
+				start_i = i;
+				while (str[i] && str[i] != '\'' && str[i] != '\"'
+					&& str[i] != ' ' && str[i] != '\t' && str[i] != '|'
+					&& str[i] != '<' && str[i] != '>')
 				{
-					filename[j] = str[(*i)];
-					j++;
-					(*i)++;
+					extrac_expan[w++] = str[i];
+					extracted[j++] = str[i];
+					i++;
 				}
-				if (str[(*i)] == quote)
-				{
-					filename[j] = str[(*i)];
-					j++;
-					(*i)++;
-				}
+				if (i > start_i)
+					node->expand = 1;
 			}
 			else
-			{
-				filename[j] = str[(*i)];
-				j++;
-				(*i)++;
-			}
+				extracted[j++] = str[i++];
 		}
-		filename[j] = '\0';
-		return (filename);
+		else if (node->state == IN_SINGLE)
+		{
+			if (str[i] == '\'')
+			{
+				node->state = NORMAL;
+				i++;
+			}
+			else
+				extracted[j++] = str[i++];
+		}
+		else if (node->state == IN_DOUBLE)
+		{
+			if (str[i] == '$')
+			{
+				start_i = i;
+				while (str[i] && str[i] != '\'' && str[i] != '\"'
+					&& str[i] != ' ' && str[i] != '\t' && str[i] != '|'
+					&& str[i] != '<' && str[i] != '>')
+				{
+					extrac_expan[w++] = str[i];
+					extracted[j++] = str[i];
+					i++;
+				}
+				if (i > start_i)
+					node->expand = 1;
+			}
+			else if (str[i] == '\"')
+			{
+				node->state = NORMAL;
+				i++;
+			}
+			else
+				extracted[j++] = str[i++];
+		}
 	}
-	else
-		return (NULL);
+	extracted[j] = '\0';
+	extrac_expan[w] = '\0';
+	if (w > 0)
+		node->expand_value = extrac_expan;
+	return (extracted);
 }
 
-char	*check_for_heredoc(token_type type, int *i, char *str, t_gc *gc)
+char	*extract_word_with_quotes(char *str, int *i, int size, t_gc *gc)
 {
-	int		size;
 	int		j;
-	char	*heredoc;
+	char	*word;
 	char	quote;
 
 	j = 0;
-	size = word_len(str, (*i));
-	if (type == T_HEREDOC)
+	while (str[(*i)] == ' ' || str[(*i)] == '\t')
+		(*i)++;
+	word = gc_malloc(sizeof(char) * (size + 1), gc);
+	while (j < size && str[(*i)])
 	{
-		while (str[(*i)] == ' ' || str[(*i)] == '\t')
-			(*i)++;
-		heredoc = gc_malloc(sizeof(char) * (size + 1), gc);
-		while (j < size && str[(*i)])
+		if (str[(*i)] == '\'' || str[(*i)] == '\"')
 		{
-			if (str[(*i)] == '\'' || str[(*i)] == '\"')
-			{
-				quote = str[(*i)];
-				heredoc[j] = str[(*i)];
-				j++;
-				(*i)++;
-				while (str[(*i)] && str[(*i)] != quote)
-				{
-					heredoc[j] = str[(*i)];
-					j++;
-					(*i)++;
-				}
-				if (str[(*i)] == quote)
-				{
-					heredoc[j] = str[(*i)];
-					j++;
-					(*i)++;
-				}
-			}
-			else
-			{
-				heredoc[j] = str[(*i)];
-				j++;
-				(*i)++;
-			}
+			quote = str[(*i)];
+			word[j++] = str[(*i)++];
+			while (str[(*i)] && str[(*i)] != quote)
+				word[j++] = str[(*i)++];
+			if (str[(*i)] == quote)
+				word[j++] = str[(*i)++];
 		}
-		heredoc[j] = '\0';
-		return (heredoc);
+		else
+			word[j++] = str[(*i)++];
 	}
-	else
+	word[j] = '\0';
+	return (word);
+}
+
+char	*check_for_fname(t_token *new, int *i, char *str, t_gc *gc)
+{
+	int		size;
+	char	*filename;
+
+	if (new->type != T_REDIR_IN &&new->type != T_REDIR_OUT
+		&&new->type != T_REDIR_APPEND)
 		return (NULL);
+	size = word_len(str, (*i));
+	filename = extract_word_with_quotes(str, i, size, gc);
+	filename = process_quotes_and_expand(new, filename, size, gc);
+	return (filename);
+}
+
+char	*check_for_heredoc(t_token *new, int *i, char *str, t_gc *gc)
+{
+	int		size;
+	char	*heredoc;
+
+	if (new->type != T_HEREDOC)
+		return (NULL);
+	size = word_len(str, (*i));
+	heredoc = extract_word_with_quotes(str, i, size, gc);
+	heredoc = process_quotes_and_expand(new, heredoc, size, gc);
+	return (heredoc);
 }
 
 void	get_state(t_token *node, int size, t_gc *gc)
 {
-	int			i;
-	int			j;
-	char		*extracted;
+	int		i;
+	int		j;
+	int		w;
+	char	*extracted;
+	char	*extrac_expan;
+	int		start_w;
+	int		start_i;
 
 	j = 0;
 	i = 0;
+	w = 0;
+	node->state = NORMAL;
+	node->expand = 0;
 	extracted = gc_malloc(sizeof(char) * (size + 1), gc);
-	while(node->value[i])
+	extrac_expan = gc_malloc(sizeof(char) * (size + 1), gc);
+	while (node->value[i])
 	{
 		if (node->state == NORMAL)
 		{
 			if (node->value[i] == '\'')
+			{
 				node->state = IN_SINGLE;
+				i++;
+			}
 			else if (node->value[i] == '\"')
+			{
 				node->state = IN_DOUBLE;
+				i++;
+			}
 			else if (node->value[i] == '$')
 			{
-				extracted[j++] = node->value[i];
-				node->expand = 1;
+				start_w = w;
+				start_i = i;
+				while (node->value[i] && node->value[i] != '\''
+					&& node->value[i] != '\"' && node->value[i] != ' '
+					&& node->value[i] != '\t' && node->value[i] != '|'
+					&& node->value[i] != '<' && node->value[i] != '>')
+				{
+					extrac_expan[w++] = node->value[i];
+					extracted[j++] = node->value[i];
+					i++;
+				}
+				if (i > start_i)
+					node->expand = 1;
 			}
 			else
-				extracted[j++] = node->value[i];
+				extracted[j++] = node->value[i++];
 		}
 		else if (node->state == IN_SINGLE)
 		{
-			if (node->value[i] == '$')
-				extracted[j++] = node->value[i];
-			else if (node->value[i] == '\'')
+			if (node->value[i] == '\'')
+			{
 				node->state = NORMAL;
+				i++;
+			}
 			else
-				extracted[j++] = node->value[i];
+				extracted[j++] = node->value[i++];
 		}
 		else if (node->state == IN_DOUBLE)
 		{
 			if (node->value[i] == '$')
 			{
-				extracted[j++] = node->value[i];
-				node->expand = 1;
+				start_w = w;
+				start_i = i;
+				while (node->value[i] && node->value[i] != '\''
+					&& node->value[i] != '\"' && node->value[i] != ' '
+					&& node->value[i] != '\t' && node->value[i] != '|'
+					&& node->value[i] != '<' && node->value[i] != '>')
+				{
+					extrac_expan[w++] = node->value[i];
+					extracted[j++] = node->value[i];
+					i++;
+				}
+				if (i > start_i)
+					node->expand = 1;
 			}
 			else if (node->value[i] == '\"')
+			{
 				node->state = NORMAL;
+				i++;
+			}
 			else
-				extracted[j++] = node->value[i];
+				extracted[j++] = node->value[i++];
 		}
-		i++;
 	}
-	extracted[j++] = '\0';
+	extracted[j] = '\0';
+	extrac_expan[w] = '\0';
 	node->value = extracted;
+	node->expand_value = extrac_expan;
 }
+
+// void	get_state(t_token *node, int size, t_gc *gc)
+// {
+// 	int			i;
+// 	int			j;
+// 	char		*extracted;
+
+// 	j = 0;
+// 	i = 0;
+// 	extracted = gc_malloc(sizeof(char) * (size + 1), gc);
+// 	while(node->value[i])
+// 	{
+// 		if (node->state == NORMAL)
+// 		{
+// 			if (node->value[i] == '\'')
+// 				node->state = IN_SINGLE;
+// 			else if (node->value[i] == '\"')
+// 				node->state = IN_DOUBLE;
+// 			else if (node->value[i] == '$')
+// 			{
+// 				extracted[j++] = node->value[i];
+// 				node->expand = 1;
+// 			}
+// 			else
+// 				extracted[j++] = node->value[i];
+// 		}
+// 		else if (node->state == IN_SINGLE)
+// 		{
+// 			if (node->value[i] == '$')
+// 				extracted[j++] = node->value[i];
+// 			else if (node->value[i] == '\'')
+// 				node->state = NORMAL;
+// 			else
+// 				extracted[j++] = node->value[i];
+// 		}
+// 		else if (node->state == IN_DOUBLE)
+// 		{
+// 			if (node->value[i] == '$')
+// 			{
+// 				extracted[j++] = node->value[i];
+// 				node->expand = 1;
+// 			}
+// 			else if (node->value[i] == '\"')
+// 				node->state = NORMAL;
+// 			else
+// 				extracted[j++] = node->value[i];
+// 		}
+// 		i++;
+// 	}
+// 	extracted[j++] = '\0';
+// 	node->value = extracted;
+// }
 
 // void	extract_word(t_token **head)
 // {
@@ -293,8 +534,8 @@ void	add_to_list(t_token **head, token_type type, char *value, int *i,
 	new->value = value;
 	new->state = NORMAL;
 	new->expand = 0;
-	new->filename = check_for_fname(new->type, i, str, gc);
-	new->heredoc_del = check_for_heredoc(new->type, i, str, gc);
+	new->filename = check_for_fname(new, i, str, gc);
+	new->heredoc_del = check_for_heredoc(new, i, str, gc);
 	new->next = NULL;
 	if (!(*head))
 	{
@@ -419,7 +660,7 @@ void	handle_quotes(char *str, t_token **head, int *i, t_gc *gc)
 	quoted_word[j] = '\0';
 	add_to_list(head, T_WORD, quoted_word, i, str, gc);
 	tmp = (*head);
-	while(tmp && tmp->next)
+	while (tmp && tmp->next)
 		tmp = tmp->next;
 	get_state(tmp, size, gc);
 	// extract_word(head);
@@ -431,7 +672,7 @@ void	handle_word(char *str, t_token **head, int *i, t_gc *gc)
 	int		j;
 	int		size;
 	t_token	*tmp;
-	
+
 	j = 0;
 	size = word_len(str, (*i));
 	if (size == 0)
@@ -513,7 +754,7 @@ int	main(int argc, char **argv)
 		if (line[0] == '\0')
 		{
 			free(line);
-			continue;
+			continue ;
 		}
 		if (ft_strncmp(line, "exit", 4) == 0)
 		{

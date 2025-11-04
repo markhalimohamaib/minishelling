@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/01 18:01:57 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/11/04 23:01:06 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ typedef struct s_token
 {
 	token_type		type;
 	char			*value;
+	char			*expand_value;
 	int				state;
 	int				expand;
 	char			*filename;
