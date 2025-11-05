@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/24 17:05:06 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/04 23:57:44 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/11/05 23:23:57 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,8 @@ void	print_token_list(t_token *head)
 			printf(" | state=%d", cur->state);
 		if (cur->expand)
 			printf(" | expands=%d", cur->expand);
-		if (cur->expand_value && cur->expand_value[0] != '\0')
+		if ((cur->type == T_WORD && cur->expand_value && cur->expand_value == NULL)
+			|| (cur->type == T_WORD && cur->expand_value && cur->expand_value[0] != '\0'))
 			printf(" | expand_val=%s", cur->expand_value);
 		if (cur->filename)
 			printf(" | filename = %s", cur->filename);
@@ -703,36 +704,49 @@ token_type	is_metachar(char c)
 	return (0);
 }
 
+// int	check_syntax(t_token *head)
+// {
+// 	t_token	*tmp;
+
+// 	tmp = head;
+// 	while (tmp)
+// 	{
+// 		if ((tmp->type == T_PIPE && !(tmp->next))
+// 			|| (tmp->type == T_REDIR_APPEND && !(tmp->next))
+// 			|| (tmp->type == T_REDIR_IN && !(tmp->next))
+// 			|| (tmp->type == T_REDIR_OUT && !(tmp->next))
+// 			|| (tmp->type == T_HEREDOC && !(tmp->next)))
+// 			return (1);
+// 		else if ((tmp->type == T_PIPE && tmp->next == NULL)
+// 				|| (tmp->type == T_REDIR_IN && tmp->next == NULL)
+// 				|| (tmp->type == T_REDIR_OUT && tmp->next == NULL)
+// 				|| (tmp->type == T_REDIR_APPEND && tmp->next == NULL)
+// 				|| (tmp->type == T_HEREDOC && tmp->next == NULL))
+// 			return (1);
+// 		tmp = tmp->next;
+// 	}
+// }
+
 t_token	*tokenize_inp(char *str, t_token **head, t_gc *gc)
 {
 	int	i;
-	int	j;
-	int	start;
 
 	i = 0;
-	j = 0;
 	while (str[i])
 	{
-		start = 0;
 		while (is_space(str[i]))
 			i++;
 		if (is_metachar(str[i]))
-		{
 			handle_operator(str, head, &i, gc);
-		}
 		else if (is_quote(str[i]))
-		{
 			handle_quotes(str, head, &i, gc);
-		}
 		else
-		{
 			handle_word(str, head, &i, gc);
-		}
 	}
 	return (*head);
 }
 
-int	main(int argc, char **argv)
+int	main(int argc, char **argv, char **env)
 {
 	char	*line;
 	char	**arr;
@@ -765,12 +779,18 @@ int	main(int argc, char **argv)
 		if (*line)
 			add_history(line);
 		head = tokenize_inp(line, &head, &gc);
+		// if (check_syntax(head))
+		// {
+		// 	free(line);
+		// 	continue;
+		// }
 		print_token_list(head);
 		ast = parse_cmd(&head, &gc);
 		print_ast(ast);
 		free(line);
 		gc_free_all(&gc);
 		gc_init(&gc);
+		printf("%s\n", env[1]);
 	}
 	gc_free_all(&gc);
 }

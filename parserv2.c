@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 18:51:06 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/10/31 00:12:15 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/11/05 23:42:41 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -280,6 +280,7 @@ t_node	*create_nodes(t_token **head, char **cmd, t_gc *gc)
 	node->type = CMD_NODE;
 	node->cmd = cmd;
 	node->filename = NULL;
+	// node->full_dir = ft
 	node->redir_type = 0;
 	node->right = NULL;
 	node->left = NULL;
