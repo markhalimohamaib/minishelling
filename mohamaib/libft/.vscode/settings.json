@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+		"stdlib.h": "c",
+		"ft_lstiter.C": "cpp"
+	}
+}

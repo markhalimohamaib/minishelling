@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/10/24 17:23:29 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/11/06 00:05:27 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,12 +46,20 @@ typedef enum
 	EOF_NODE
 }					node_type;
 
+typedef enum
+{
+	NORMAL,
+	IN_SINGLE,
+	IN_DOUBLE
+}					token_state;
+
 typedef struct s_token
 {
 	token_type		type;
 	char			*value;
-	// int				quoted;
-	// int				expand;
+	char			*expand_value;
+	int				state;
+	int				expand;
 	char			*filename;
 	char			*heredoc_del;
 	struct s_token	*next;
@@ -60,19 +68,44 @@ typedef struct s_token
 typedef struct s_node
 {
 	node_type		type;
-	//for cmd
 	char			**cmd;
+	char			**full_dir;
 	char			*filename;
-	// t_token			*redirs;
 	token_type		redir_type;
-	//for pipe
 	struct s_node	*left;
 	struct s_node	*right;
 }					t_node;
 
+typedef struct s_redirs_data
+{
+	int		i;
+	int		count;
+	char	**cmd;
+	t_node	*node;
+	t_node	*redir_node;
+	t_token	*tmp;
+	t_token	*tmp2;
+}					t_redirs_data;
+// void print_token_list(t_token *head);
+
 //parser.c
-t_node	*parse_cmd(t_token **head);
-void	print_ast(t_node *root);
-void	gc_init(t_gc *gc);
-void	*gc_malloc(t_gc *gc, size_t size);
-void	gc_free_all(t_gc *gc);
+// t_node	*parse_cmd(t_token **head, t_gc *gc);
+// void	print_ast(t_node *root);
+// void	gc_init(t_gc *gc);
+// void	*gc_malloc(size_t size, t_gc *gc);
+// void	gc_free_all(t_gc *gc);
+// char	*gc_ft_strdup(const char *str, t_gc *gc);
+
+//parserv2.c
+
+
+
+//tokenizerv3.c
+t_token		*tokenize_inp(char *str, t_token **head, t_gc *gc);
+token_type	is_metachar(char c);
+void		handle_word(char *str, t_token **head, int *i, t_gc *gc);
+void		handle_quotes(char *str, t_token **head, int *i, t_gc *gc);
+void	handle_operator(char *str, t_token **head, int *i, t_gc *gc);
+
+
+

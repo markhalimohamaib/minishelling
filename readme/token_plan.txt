@@ -1,0 +1,79 @@
+### 1. **`handle_operator(str, *i, **token_list)`**
+- Check current character at `i`
+- **Single character operators**: `|`
+  - Create token with type `T_PIPE`
+  - Advance `i` by 1
+- **Potentially double operators**: `<`, `>`
+  - Look ahead to `i+1`
+  - If `<<` → create `T_HEREDOC` token, advance `i` by 2
+  - If `>>` → create `T_REDIR_APPEND` token, advance `i` by 2
+  - If `<` alone → create `T_REDIR_IN` token, advance `i` by 1
+  - If `>` alone → create `T_REDIR_OUT` token, advance `i` by 1
+- Append token to list
+
+### 2. **`handle_quotes(str, *i, **token_list)`**
+- Save starting quote character (`'` or `"`)
+- Save start position `start = i`
+- Advance `i` by 1 (skip opening quote)
+- **Find closing quote**:
+  - Scan forward until matching quote is found
+  - If no closing quote found → syntax error
+  - Save end position `end = closing_quote_index`
+- Extract substring from `start+1` to `end-1` (content between quotes)
+- Send to normalization function
+- Create token with:
+  - `type = T_WORD`
+  - `value = extracted_content`
+  - `quoted = 1` if single quotes, `2` if double quotes
+  - `expands = 0` if single quotes, `1` if double quotes
+- Advance `i` to `end + 1` (past closing quote)
+
+### 3. **`handle_word(str, *i, **token_list)`**
+- Save start position `start = i`
+- **Scan forward while**:
+  - Not whitespace
+  - Not operator (`|`, `<`, `>`)
+  - Not quote (`'`, `"`)
+  - Not end of string
+- Extract substring from `start` to `i-1`
+- Check for `$` in extracted word:
+  - If present → `expands = 1`
+  - If absent → `expands = 0`
+- Create token with:
+  - `type = T_WORD`
+  - `value = extracted_substring`
+  - `quoted = 0` (not quoted)
+  - `expands = 1 or 0` based on `$` presence
+- `i` is already positioned at next character (no need to advance)
+
+
+------------------------------------------------------------------------------
+
+
+## Quote Normalization Function
+
+### `normalize_quotes(str) → (normalized_string, quote_state)`
+
+**Purpose**: Handle nested/mixed quotes and determine final quoting state
+
+**State Machine**:
+- **State 0**: Normal (unquoted)
+- **State 1**: Inside single quotes
+- **State 2**: Inside double quotes
+
+**Algorithm**:
+1. Initialize `state = 0`, `result = empty string`
+2. For each character in input:
+   - **If state == 0 (normal)**:
+     - `'` → transition to state 1, don't append quote
+     - `"` → transition to state 2, don't append quote
+     - Other → append to result
+   - **If state == 1 (single quotes)**:
+     - `'` → transition to state 0, don't append quote
+     - Other → append to result (even `"` is literal)
+   - **If state == 2 (double quotes)**:
+     - `"` → transition to state 0, don't append quote
+     - Other → append to result (even `'` is literal)
+3. Return normalized string and final state
+
+**Edge case**: If final state != 0, unclosed quote → syntax error

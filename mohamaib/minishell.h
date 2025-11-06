@@ -1,0 +1,136 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
+/*   Updated: 2025/11/05 23:59:59 by mohamaib         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#ifndef MINISHELL_H
+# define MINISHELL_H
+
+# include "libft/libft.h"
+# include <readline/history.h>
+# include <readline/readline.h>
+# include <stdio.h>
+# include <stdlib.h>
+
+typedef struct s_gc_node
+{
+	void				*ptr;
+	struct s_gc_node	*next;
+}	t_gc_node;
+
+typedef struct s_gc
+{
+	t_gc_node	*list;
+}	t_gc;
+
+typedef enum e_token_type
+{
+	T_WORD,
+	T_PIPE,
+	T_REDIR_IN,
+	T_REDIR_OUT,
+	T_REDIR_APPEND,
+	T_HEREDOC,
+	T_EOF
+}	token_type;
+
+typedef enum e_node_type
+{
+	CMD_NODE,
+	PIPE_NODE,
+	REDIR_NODE,
+	EOF_NODE
+}	node_type;
+
+typedef enum e_token_state
+{
+	NORMAL,
+	IN_SINGLE,
+	IN_DOUBLE
+}	token_state;
+
+typedef struct s_token
+{
+	token_type		type;
+	char			*value;
+	char			*expand_value;
+	int				state;
+	int				expand;
+	char			*filename;
+	char			*heredoc_del;
+	struct s_token	*next;
+}	t_token;
+
+typedef struct s_node
+{
+	node_type		type;
+	char			**cmd;
+	char			**full_dir;
+	char			*filename;
+	token_type		redir_type;
+	struct s_node	*left;
+	struct s_node	*right;
+}	t_node;
+
+/* gc.c */
+void		gc_init(t_gc *gc);
+void		*gc_malloc(size_t size, t_gc *gc);
+void		gc_free_all(t_gc *gc);
+char		*gc_ft_strdup(const char *str, t_gc *gc);
+
+/* tokenizer.c */
+int			word_len(char *str, int i);
+void		add_token_to_list(t_token **head, t_token *new);
+t_token		*create_token(token_type type, char *value, t_gc *gc);
+void		handle_operator(char *str, t_token **head, int *i, t_gc *gc);
+t_token		*tokenize_input(char *str, t_gc *gc);
+
+/* tokenizer_words.c */
+char		*extract_word(char *str, int *i, int size, t_gc *gc);
+void		handle_expansion_char(t_token *token, char *str, int *i,
+				int *j, int *w, char *result, char *expan);
+char		*remove_quotes_and_track(t_token *token, char *str,
+				int size, t_gc *gc);
+void		handle_quoted_word(char *str, t_token **head, int *i, t_gc *gc);
+void		handle_regular_word(char *str, t_token **head, int *i, t_gc *gc);
+void		process_redir_target(t_token *token, char *str, int *i, t_gc *gc);
+
+/* parser.c */
+t_node		*create_cmd_node(char **cmd, t_gc *gc);
+t_node		*create_redir_node(token_type type, char *filename,
+				t_node *left, t_gc *gc);
+t_node		*create_pipe_node(t_node *left, t_node *right, t_gc *gc);
+int			count_cmd_words(t_token *head);
+char		**build_cmd_array(t_token **head, t_gc *gc);
+
+/* parser_build.c */
+t_token		*find_last_redir(t_token *start);
+t_node		*wrap_with_redir(t_token *redir, t_node *node, t_gc *gc);
+void		skip_to_pipe(t_token **head);
+t_node		*parse_simple_cmd(t_token **head, t_gc *gc);
+t_node		*parse_pipeline(t_token **head, t_gc *gc);
+
+/* ast_print.c */
+void		print_indent(int depth);
+void		print_cmd_array(char **cmd);
+void		print_redir_type(token_type type, char *filename);
+void		print_ast_node(t_node *node, int depth);
+void		print_ast(t_node *root);
+
+/* token_print.c */
+const char	*token_type_name(token_type type);
+void		print_token_details(t_token *token);
+void		print_token_list(t_token *head);
+
+/* main.c */
+int			should_exit(char *line);
+void		process_line(char *line, t_gc *gc);
+
+#endif
