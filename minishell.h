@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/05 23:43:54 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/11/06 00:05:27 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,7 @@ t_token		*tokenize_inp(char *str, t_token **head, t_gc *gc);
 token_type	is_metachar(char c);
 void		handle_word(char *str, t_token **head, int *i, t_gc *gc);
 void		handle_quotes(char *str, t_token **head, int *i, t_gc *gc);
+void	handle_operator(char *str, t_token **head, int *i, t_gc *gc);
 
 
 
