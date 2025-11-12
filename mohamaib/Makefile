@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+         #
+#    By: markhali <markhali@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#              #
-#    Updated: 2025/11/05 23:59:59 by mohamaib         ###   ########.fr        #
+#    Updated: 2025/11/12 13:22:18 by markhali         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,9 +24,24 @@ SRCS		= main.c \
 			  parser.c \
 			  parser_build.c \
 			  ast_print.c \
-			  token_print.c
+			  token_print.c \
+			  builtin_utils.c \
+			  exec.c
 
-OBJS		= $(SRCS:.c=.o)
+BUILTIN_DIR	= builtins
+BUILTIN_SRCS = $(BUILTIN_DIR)/builtin_cd.c \
+			   $(BUILTIN_DIR)/builtin_echo.c \
+			   $(BUILTIN_DIR)/builtin_env.c \
+			   $(BUILTIN_DIR)/builtin_exit.c \
+			   $(BUILTIN_DIR)/builtin_export.c \
+			   $(BUILTIN_DIR)/builtin_pwd.c \
+			   $(BUILTIN_DIR)/builtin_unset.c \
+			   $(BUILTIN_DIR)/env_getset.c \
+			   $(BUILTIN_DIR)/env_init.c \
+			   $(BUILTIN_DIR)/env_utils.c
+
+ALL_SRCS	= $(SRCS) $(BUILTIN_SRCS)
+OBJS		= $(ALL_SRCS:.c=.o)
 
 all: $(LIBFT) $(NAME)
 

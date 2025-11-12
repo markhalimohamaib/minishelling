@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/05 23:59:59 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/11/12 13:43:28 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,32 @@
 # include <readline/readline.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <termios.h>
+# include <unistd.h>
+# include <string.h>
+# include <errno.h>
+# include <fcntl.h>
+# include <sys/types.h>
+# include <sys/wait.h>
+
+typedef struct s_env
+{
+	char			*key;
+	char			*value;
+	struct s_env	*next;
+}	t_env;
+
+typedef enum e_builtin_type
+{
+	BLT_NONE,
+	BLT_ECHO,
+	BLT_CD,
+	BLT_PWD,
+	BLT_EXPORT,
+	BLT_UNSET,
+	BLT_ENV,
+	BLT_EXIT
+}	t_builtin_type;
 
 typedef struct s_gc_node
 {
@@ -77,60 +103,90 @@ typedef struct s_node
 	token_type		redir_type;
 	struct s_node	*left;
 	struct s_node	*right;
+	t_builtin_type	builtin;
 }	t_node;
 
 /* gc.c */
-void		gc_init(t_gc *gc);
-void		*gc_malloc(size_t size, t_gc *gc);
-void		gc_free_all(t_gc *gc);
-char		*gc_ft_strdup(const char *str, t_gc *gc);
+void			gc_init(t_gc *gc);
+void			*gc_malloc(size_t size, t_gc *gc);
+void			gc_free_all(t_gc *gc);
+char			*gc_ft_strdup(const char *str, t_gc *gc);
 
 /* tokenizer.c */
-int			word_len(char *str, int i);
-void		add_token_to_list(t_token **head, t_token *new);
-t_token		*create_token(token_type type, char *value, t_gc *gc);
-void		handle_operator(char *str, t_token **head, int *i, t_gc *gc);
-t_token		*tokenize_input(char *str, t_gc *gc);
+int				word_len(char *str, int i);
+void			add_token_to_list(t_token **head, t_token *new);
+t_token			*create_token(token_type type, char *value, t_gc *gc);
+void			handle_operator(char *str, t_token **head, int *i, t_gc *gc);
+t_token			*tokenize_input(char *str, t_gc *gc);
 
 /* tokenizer_words.c */
-char		*extract_word(char *str, int *i, int size, t_gc *gc);
-void		handle_expansion_char(t_token *token, char *str, int *i,
-				int *j, int *w, char *result, char *expan);
-char		*remove_quotes_and_track(t_token *token, char *str,
-				int size, t_gc *gc);
-void		handle_quoted_word(char *str, t_token **head, int *i, t_gc *gc);
-void		handle_regular_word(char *str, t_token **head, int *i, t_gc *gc);
-void		process_redir_target(t_token *token, char *str, int *i, t_gc *gc);
+char			*extract_word(char *str, int *i, int size, t_gc *gc);
+void			handle_expansion_char(t_token *token, char *str, int *i,
+					int *j, int *w, char *result, char *expan);
+char			*remove_quotes_and_track(t_token *token, char *str,
+					int size, t_gc *gc);
+void			handle_quoted_word(char *str, t_token **head, int *i, t_gc *gc);
+void			handle_regular_word(char *str, t_token **head,
+					int *i, t_gc *gc);
+void			process_redir_target(t_token *token, char *str,
+					int *i, t_gc *gc);
 
 /* parser.c */
-t_node		*create_cmd_node(char **cmd, t_gc *gc);
-t_node		*create_redir_node(token_type type, char *filename,
-				t_node *left, t_gc *gc);
-t_node		*create_pipe_node(t_node *left, t_node *right, t_gc *gc);
-int			count_cmd_words(t_token *head);
-char		**build_cmd_array(t_token **head, t_gc *gc);
+t_node			*create_cmd_node(char **cmd, t_gc *gc);
+t_node			*create_redir_node(token_type type, char *filename,
+					t_node *left, t_gc *gc);
+t_node			*create_pipe_node(t_node *left, t_node *right, t_gc *gc);
+int				count_cmd_words(t_token *head);
+char			**build_cmd_array(t_token **head, t_gc *gc);
 
 /* parser_build.c */
-t_token		*find_last_redir(t_token *start);
-t_node		*wrap_with_redir(t_token *redir, t_node *node, t_gc *gc);
-void		skip_to_pipe(t_token **head);
-t_node		*parse_simple_cmd(t_token **head, t_gc *gc);
-t_node		*parse_pipeline(t_token **head, t_gc *gc);
+t_token			*find_last_redir(t_token *start);
+t_node			*wrap_with_redir(t_token *redir, t_node *node, t_gc *gc);
+void			skip_to_pipe(t_token **head);
+t_node			*parse_simple_cmd(t_token **head, t_gc *gc);
+t_node			*parse_pipeline(t_token **head, t_gc *gc);
 
 /* ast_print.c */
-void		print_indent(int depth);
-void		print_cmd_array(char **cmd);
-void		print_redir_type(token_type type, char *filename);
-void		print_ast_node(t_node *node, int depth);
-void		print_ast(t_node *root);
+void			print_indent(int depth);
+void			print_cmd_array(char **cmd);
+void			print_redir_type(token_type type, char *filename);
+void			print_ast_node(t_node *node, int depth);
+void			print_ast(t_node *root);
 
 /* token_print.c */
-const char	*token_type_name(token_type type);
-void		print_token_details(t_token *token);
-void		print_token_list(t_token *head);
+const char		*token_type_name(token_type type);
+void			print_token_details(t_token *token);
+void			print_token_list(t_token *head);
 
 /* main.c */
-int			should_exit(char *line);
-void		process_line(char *line, t_gc *gc);
+int				should_exit(char *line);
+void			process_line(char *line, t_gc *gc, t_env **env);
+
+/* builtin_utils.c */
+t_builtin_type	get_builtin_type(char *cmd);
+void			mark_builtins(t_node *node);
+int				ft_strcmp(const char *s1, const char *s2);
+
+/* exec.c */
+int				execute_node(t_node *node, t_env **env);
+int				execute_command(t_node *node, t_env **env);
+
+/* ./builtins */
+t_env			*init_env(char **envp);
+char			*get_env(t_env *env, const char *key);
+void			set_env(t_env **env, const char *key, const char *value);
+void			unset_env(t_env **env, const char *key);
+void			free_env(t_env *env);
+
+int				builtin_echo(char **argv);
+int				builtin_pwd(void);
+int				builtin_cd(char **argv, t_env **env);
+int				builtin_env(t_env *env);
+int				builtin_export(t_env **env, char **args);
+int				builtin_unset(t_env **env, char **args);
+int				builtin_exit(char **argv);
+
+int				is_valid_identifier(const char *str);
+char			*ft_strndup(const char *s, size_t n);
 
 #endif
