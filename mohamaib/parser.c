@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/05 23:59:59 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/11/08 16:40:07 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ t_node	*create_cmd_node(char **cmd, t_gc *gc)
 	node->redir_type = 0;
 	node->right = NULL;
 	node->left = NULL;
+	node->builtin = BLT_NONE;
 	return (node);
 }
 
@@ -38,6 +39,7 @@ t_node	*create_redir_node(token_type type, char *filename,
 	node->redir_type = type;
 	node->left = left;
 	node->right = NULL;
+	node->builtin = BLT_NONE;
 	return (node);
 }
 
@@ -52,6 +54,7 @@ t_node	*create_pipe_node(t_node *left, t_node *right, t_gc *gc)
 	node->cmd = NULL;
 	node->filename = NULL;
 	node->redir_type = 0;
+	node->builtin = BLT_NONE;
 	return (node);
 }
 

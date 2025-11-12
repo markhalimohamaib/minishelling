@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ast_print.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/05 23:59:59 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/11/08 18:25:01 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,8 @@ void	print_ast_node(t_node *node, int depth)
 	{
 		printf("├─ CMD: ");
 		print_cmd_array(node->cmd);
+		if (node->builtin != BLT_NONE)
+			printf("  [builtin]");
 		printf("\n");
 	}
 	else if (node->type == REDIR_NODE)

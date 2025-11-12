@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/05 23:59:59 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/11/12 13:44:07 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int	should_exit(char *line)
 	return (0);
 }
 
-void	process_line(char *line, t_gc *gc)
+void	process_line(char *line, t_gc *gc, t_env **env)
 {
 	t_token	*tokens;
 	t_node	*ast;
@@ -33,18 +33,27 @@ void	process_line(char *line, t_gc *gc)
 	tokens = tokenize_input(line, gc);
 	print_token_list(tokens);
 	ast = parse_pipeline(&tokens, gc);
+	mark_builtins(ast);
 	print_ast(ast);
+	if (ast)
+		execute_node(ast, env);
 }
 
-int	main(int argc, char **argv, char **env)
+int	main(int argc, char **argv, char **envp)
 {
 	char	*line;
 	t_gc	gc;
+	t_env	*env;
 
 	(void)argc;
 	(void)argv;
-	(void)env;
 	gc_init(&gc);
+	env = init_env(envp);
+	if (!env)
+	{
+		ft_putstr_fd("minishell: failed to initialize environment\n", 2);
+		return (1);
+	}
 	while (1)
 	{
 		line = readline("minishell-> ");
@@ -53,11 +62,12 @@ int	main(int argc, char **argv, char **env)
 			free(line);
 			break ;
 		}
-		process_line(line, &gc);
+		process_line(line, &gc, &env);
 		free(line);
 		gc_free_all(&gc);
 		gc_init(&gc);
 	}
 	gc_free_all(&gc);
+	free_env(env);
 	return (0);
 }
