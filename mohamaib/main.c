@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/12 13:44:07 by markhali         ###   ########.fr       */
+/*   Updated: 2025/11/24 21:45:21 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 	mark_builtins(ast);
 	print_ast(ast);
 	if (ast)
-		execute_node(ast, env);
+		execute_node(ast, env, gc);
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -56,7 +56,7 @@ int	main(int argc, char **argv, char **envp)
 	}
 	while (1)
 	{
-		line = readline("minishell-> ");
+		line = readline("minishell$ ");
 		if (should_exit(line))
 		{
 			free(line);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 10:29:31 by markhali          #+#    #+#             */
-/*   Updated: 2025/11/12 13:41:36 by markhali         ###   ########.fr       */
+/*   Updated: 2025/11/24 00:20:13 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ static int	execute_builtin(t_node *node, t_env **env)
 	return (0);
 }
 
-int	execute_command(t_node *node, t_env **env)
+int	execute_command(t_node *node, t_env **env, t_gc *gc)
 {
 	if (!node || !node->cmd || !node->cmd[0])
 		return (0);
@@ -39,33 +39,45 @@ int	execute_command(t_node *node, t_env **env)
 	if (node->builtin != BLT_NONE)
 		return (execute_builtin(node, env));
 	// External commands will be implemented later
+	if(node->builtin == BLT_NONE)
+		return (exec_cmd(node, env, gc));
 	printf("minishell: command not found: %s\n", node->cmd[0]);
 	return (127);
 }
 
-int	execute_node(t_node *node, t_env **env)
+int	execute_node(t_node *node, t_env **env, t_gc *gc)
 {
 	if (!node)
 		return (0);
-	if (node->type == CMD_NODE)
-		return (execute_command(node, env));
+	if (node->type == PIPE_NODE)
+	{
+		// Pipes will be implemented later
+		// printf("Note: Pipeline detected but not yet implemented\n");
+		// For now, just execute left side
+		// if (node->left)
+		// 	execute_node(node->left, env, gc);
+		// if (node->right)
+		// 	execute_node(node->right, env, gc);
+		return (execute_pipe(node, env, gc));
+	}
 	else if (node->type == REDIR_NODE)
 	{
 		// For now, just execute the left node (command)
 		// Redirections will be implemented later
-		printf("Note: Redirection detected but not yet implemented\n");
-		if (node->left)
-			return (execute_node(node->left, env));
+		// printf("Note: Redirection detected but not yet implemented\n");
+		// if (node->left)
+		// 	return (execute_node(node->left, env, gc));
+		// return (execute_redir(node, env, gc));
+		if (node->redir_type == T_REDIR_IN)
+			return (handle_redir_in(node, env, gc));
+		else if (node->redir_type == T_REDIR_OUT)
+			return (handle_redir_out(node, env, gc));
+		else if (node->redir_type == T_REDIR_APPEND)
+			return (handle_redir_append(node, env, gc));
+		else if (node->redir_type == T_HEREDOC)
+			return (handle_redir_heredoc(node, env, gc));
 	}
-	else if (node->type == PIPE_NODE)
-	{
-		// Pipes will be implemented later
-		printf("Note: Pipeline detected but not yet implemented\n");
-		// For now, just execute left side
-		if (node->left)
-			execute_node(node->left, env);
-		if (node->right)
-			execute_node(node->right, env);
-	}
+	else if (node->type == CMD_NODE)
+		return (execute_command(node, env, gc));
 	return (0);
 }

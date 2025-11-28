@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: markhali <markhali@student.42.fr>          +#+  +:+       +#+         #
+#    By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#              #
-#    Updated: 2025/11/12 13:22:18 by markhali         ###   ########.fr        #
+#    Updated: 2025/11/24 21:44:26 by mohamaib         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,10 @@ SRCS		= main.c \
 			  ast_print.c \
 			  token_print.c \
 			  builtin_utils.c \
-			  exec.c
+			  exec.c \
+			  exec_utils.c \
+			  exec_utils2.c \
+			  exec_utils3.c
 
 BUILTIN_DIR	= builtins
 BUILTIN_SRCS = $(BUILTIN_DIR)/builtin_cd.c \

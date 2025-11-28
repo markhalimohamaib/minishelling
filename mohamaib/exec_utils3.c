@@ -1,0 +1,105 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_utils3.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/23 20:02:33 by mohamaib          #+#    #+#             */
+/*   Updated: 2025/11/24 00:28:38 by mohamaib         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
+
+int	handle_redir_in(t_node *node, t_env **env, t_gc *gc)
+{
+	int	exit_code;
+	
+	node->file_fd = open(node->filename, O_RDONLY);
+	if (node->file_fd < 0)
+	{
+		printf("%s, no such file or directory", node->filename);
+		exit(1);
+	}
+	node->pid1 = fork();
+	if (node->pid1 == 0)
+	{
+		dup2(node->file_fd, STDIN_FILENO);
+		close(node->file_fd);
+		execute_node(node->left, env, gc);
+		exit(0);
+	}
+	waitpid(node->pid1, &node->status, 0);
+	exit_code = (node->status >> 8);
+	close(node->file_fd);
+	return (exit_code);
+}
+
+int	handle_redir_out(t_node *node, t_env **env, t_gc *gc)
+{
+	int	exit_code;
+	
+	node->file_fd = open(node->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (node->file_fd < 0)
+	{
+		// printf("%s, no such file or directory", node->filename);
+		exit(1);
+	}
+	node->pid1 = fork();
+	if (node->pid1 == 0)
+	{
+		// printf("test");
+		dup2(node->file_fd, STDOUT_FILENO);
+		close(node->file_fd);
+		execute_node(node->left, env, gc);
+		exit(0);
+	}
+	waitpid(node->pid1, &node->status, 0);
+	exit_code = (node->status >> 8);
+	close(node->file_fd);
+	return (exit_code);
+}
+
+int	handle_redir_append(t_node *node, t_env **env, t_gc *gc)
+{
+	int	exit_code;
+	
+	node->file_fd = open(node->filename, O_WRONLY | O_APPEND, 0644);
+	if (node->file_fd < 0)
+	{
+		// printf("%s, no such file or directory", node->filename);
+		exit(1);
+	}
+	node->pid1 = fork();
+	if (node->pid1 == 0)
+	{
+		dup2(node->file_fd, STDOUT_FILENO);
+		close(node->file_fd);
+		execute_node(node->left, env, gc);
+		exit(0);
+	}
+	waitpid(node->pid1, &node->status, 0);
+	exit_code = (node->status >> 8);
+	close(node->file_fd);
+	return (exit_code);
+}
+
+int	handle_redir_heredoc(t_node *node, t_env **env, t_gc *gc)
+{
+	node->file_fd = open("/tmp/my_heredoc", O_RDWR | O_CREAT | O_TRUNC, 0644);
+	if (node->file_fd < 0)
+	{
+		// printf("%s, no such file or directory", node->filename);
+		exit(1);
+	}
+	node->pid1 = fork();
+	if (node->pid1 == 0)
+	{
+		dup2(node->file_fd, STDIN_FILENO);
+		close(node->file_fd);
+		execute_node(node->left, env, gc);
+		exit(0);
+	}
+	return (1);
+}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/12 13:43:28 by markhali         ###   ########.fr       */
+/*   Updated: 2025/11/24 01:18:25 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,11 @@ typedef struct s_token
 
 typedef struct s_node
 {
+	int				pid1;
+	int				pid2;
+	int				pipefd[2];
+	int				file_fd;
+	int				status;
 	node_type		type;
 	char			**cmd;
 	char			**full_dir;
@@ -105,6 +110,11 @@ typedef struct s_node
 	struct s_node	*right;
 	t_builtin_type	builtin;
 }	t_node;
+
+// typedef struct s_child
+// {
+	
+// }
 
 /* gc.c */
 void			gc_init(t_gc *gc);
@@ -168,8 +178,20 @@ void			mark_builtins(t_node *node);
 int				ft_strcmp(const char *s1, const char *s2);
 
 /* exec.c */
-int				execute_node(t_node *node, t_env **env);
-int				execute_command(t_node *node, t_env **env);
+int				execute_node(t_node *node, t_env **env, t_gc *gc);
+int				execute_command(t_node *node, t_env **env, t_gc *gc);
+
+/* exec_utils.c */
+int				exec_cmd(t_node *node, t_env **env, t_gc *gc);
+
+/* exec_utils2.c */
+int				execute_pipe(t_node *node, t_env **env, t_gc *gc);
+
+/* exec_utils3.c */
+int				handle_redir_in(t_node *node, t_env **env, t_gc *gc);
+int				handle_redir_out(t_node *node, t_env **env, t_gc *gc);
+int				handle_redir_append(t_node *node, t_env **env, t_gc *gc);
+int				handle_redir_heredoc(t_node *node, t_env **env, t_gc *gc);
 
 /* ./builtins */
 t_env			*init_env(char **envp);
