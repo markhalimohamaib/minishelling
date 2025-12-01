@@ -48,13 +48,13 @@ int	execute_pipe(t_node *node, t_env **env, t_gc *gc)
 
 int	execute_redir(t_node *node, t_env **env, t_gc *gc)
 {
-	if (node->type == T_REDIR_IN)
+	if (node->redir_type == T_REDIR_IN)
 		return (handle_redir_in(node, env, gc));
-	else if (node->type == T_REDIR_OUT)
+	else if (node->redir_type == T_REDIR_OUT)
 		return (handle_redir_out(node, env, gc));
-	else if (node->type == T_REDIR_APPEND)
+	else if (node->redir_type == T_REDIR_APPEND)
 		return (handle_redir_append(node, env, gc));
-	else if (node->type == T_HEREDOC)
+	else if (node->redir_type == T_HEREDOC)
 		return (handle_redir_heredoc(node, env, gc));
 	return (1);
 }
