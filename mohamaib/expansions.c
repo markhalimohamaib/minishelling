@@ -6,30 +6,30 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/30 20:00:26 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/05 23:06:55 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/06 00:07:12 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*replace_val_in_env(char *val, t_env **env)
+char	*replace_val_in_env(char *val, t_env **env, t_gc *gc)
 {
 	t_env	*tmp;
 
 	// char	*env_val;
 	tmp = (*env);
-	while (tmp)
+	while (tmp->next)
 	{
 		if (!(ft_strcmp(tmp->key, val)))
 		{
-			return (ft_strdup(tmp->value));
+			return (gc_ft_strdup(tmp->value, gc));
 			// env_val = gc_malloc(sizeof(char) * (ft_strlen(tmp->value) + 1),
 					// gc);
 			// while()
 		}
 		tmp = tmp->next;
 	}
-	return (NULL);
+	return (gc_ft_strdup("\0", gc));
 }
 
 // char	*fill_leading_val(t_segment seg)
@@ -115,7 +115,7 @@ char	*check_for_dollar(t_segment seg, t_env **env, t_gc *gc)
 		j++;
 	}
 	expand_val[j] = '\0';
-	full = gc_ft_strjoin(leading_val, replace_val_in_env(expand_val, env), gc);
+	full = gc_ft_strjoin(leading_val, replace_val_in_env(expand_val, env, gc), gc);
 	return (full);
 	// seg.str = full;
 }

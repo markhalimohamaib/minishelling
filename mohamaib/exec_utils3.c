@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 20:02:33 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/28 21:11:06 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/05 23:44:07 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ int	handle_redir_append(t_node *node, t_env **env, t_gc *gc)
 {
 	int	exit_code;
 	
-	node->file_fd = open(node->filename, O_WRONLY | O_APPEND, 0644);
+	node->file_fd = open(node->filename, O_WRONLY | O_CREAT | O_APPEND , 0644);
 	if (node->file_fd < 0)
 	{
 		// printf("%s, no such file or directory", node->filename);
