@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/30 21:51:32 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/05 21:41:01 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,14 +45,14 @@ void	skip_to_pipe(t_token **head)
 		*head = (*head)->next;
 }
 
-t_node	*parse_simple_cmd(t_token **head, t_gc *gc)
+t_node	*parse_simple_cmd(t_token **head, t_env **env, t_gc *gc)
 {
 	t_node	*node;
 	t_token	*tmp;
 	t_token	*last_redir;
 
 	tmp = (*head);
-	node = create_cmd_node(build_cmd_array(head, gc), gc);
+	node = create_cmd_node(build_cmd_array(head, env, gc), gc);
 	last_redir = find_last_redir(tmp);
 	while (last_redir)
 	{
@@ -64,18 +64,18 @@ t_node	*parse_simple_cmd(t_token **head, t_gc *gc)
 	return (node);
 }
 
-t_node	*parse_pipeline(t_token **head, t_gc *gc)
+t_node	*parse_pipeline(t_token **head, t_env ** env, t_gc *gc)
 {
 	t_node	*left;
 	t_node	*right;
 
 	if (!(*head) || (*head)->type == T_PIPE)
 		return (NULL);
-	left = parse_simple_cmd(head, gc);
+	left = parse_simple_cmd(head, env, gc);
 	if ((*head) && (*head)->type == T_PIPE)
 	{
 		(*head) = (*head)->next;
-		right = parse_pipeline(head, gc);
+		right = parse_pipeline(head, env, gc);
 		return (create_pipe_node(left, right, gc));
 	}
 	return (left);

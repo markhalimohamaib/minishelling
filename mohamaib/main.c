@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/30 21:50:31 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/05 21:37:51 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 	add_history(line);
 	tokens = tokenize_input(line, gc);
 	print_token_list(tokens);
-	ast = parse_pipeline(&tokens, gc);
+	ast = parse_pipeline(&tokens, env, gc);
 	mark_builtins(ast);
 	print_ast(ast);
 	if (ast)

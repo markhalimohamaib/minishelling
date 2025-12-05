@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/02 15:18:28 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/05 22:32:20 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ typedef struct s_token
 	t_segment		*segment;
 	int				seg_count;
 	int				state;
-	int				expand;
+	int				expand_line;
 	char			*filename;
 	char			*heredoc_del;
 	struct s_token	*next;
@@ -165,14 +165,14 @@ t_node			*create_redir_node(token_type type, char *filename,
 					t_node *left, t_gc *gc);
 t_node			*create_pipe_node(t_node *left, t_node *right, t_gc *gc);
 int				count_cmd_words(t_token *head);
-char			**build_cmd_array(t_token **head, t_gc *gc);
+char			**build_cmd_array(t_token **head, t_env **env, t_gc *gc);
 
 /* parser_build.c */
 t_token			*find_last_redir(t_token *start);
 t_node			*wrap_with_redir(t_token *redir, t_node *node, t_gc *gc);
 void			skip_to_pipe(t_token **head);
-t_node			*parse_simple_cmd(t_token **head, t_gc *gc);
-t_node			*parse_pipeline(t_token **head, t_gc *gc);
+t_node			*parse_simple_cmd(t_token **head, t_env **env, t_gc *gc);
+t_node			*parse_pipeline(t_token **head, t_env **env, t_gc *gc);
 
 /* ast_print.c */
 void			print_indent(int depth);
@@ -231,6 +231,6 @@ char			*ft_strndup(const char *s, size_t n);
 
 t_segment	*build_segment(t_token *token, t_gc *gc);
 
-void	check_for_dollar(t_segment seg, t_gc *gc);
+char	*check_for_dollar(t_segment seg, t_env **env, t_gc *gc);
 
 #endif

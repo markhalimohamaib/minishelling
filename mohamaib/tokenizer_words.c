@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/02 17:23:46 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/05 20:54:35 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void	handle_expansion_char(t_token *token, char *str, int *i,
 			result[(*j)++] = str[(*i)++];
 		}
 		if (*i > start_i)
-			token->expand = 1;
+			token->expand_line = 1;
 	}
 	else
 		result[(*j)++] = str[(*i)++];
@@ -74,7 +74,7 @@ char	*remove_quotes_and_track(t_token *token, char *str, int size, t_gc *gc)
 	j = 0;
 	// w = 0;
 	token->state = NORMAL;
-	token->expand = 0;
+	token->expand_line = 0;
 	result = gc_malloc(sizeof(char) * (size + 1), gc);
 	// expan = gc_malloc(sizeof(char) * (size + 1), gc);
 	while (str[i])
