@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/05 22:33:27 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/05 23:33:11 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ char	**build_cmd_array(t_token **head, t_env ** env, t_gc *gc)
 			while(tmp->segment[j].str)
 			{
 				if (tmp->segment[j].expands == 1)
-					tmp->segment->str = gc_ft_strdup(check_for_dollar(tmp->segment[j], env, gc), gc);
+					tmp->segment[j].str = gc_ft_strdup(check_for_dollar(tmp->segment[j], env, gc), gc);
 				cmd[i] = gc_ft_strjoin(cmd[i], tmp->segment[j].str, gc);
 				j++;
 			}

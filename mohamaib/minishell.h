@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/05 22:32:20 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/05 23:16:56 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,6 +211,12 @@ int				handle_redir_out(t_node *node, t_env **env, t_gc *gc);
 int				handle_redir_append(t_node *node, t_env **env, t_gc *gc);
 int				handle_redir_heredoc(t_node *node, t_env **env, t_gc *gc);
 
+/* segment_build.c */
+t_segment		*build_segment(t_token *token, t_gc *gc);
+
+/* expansions.c */
+char			*check_for_dollar(t_segment seg, t_env **env, t_gc *gc);
+
 /* ./builtins */
 t_env			*init_env(char **envp);
 char			*get_env(t_env *env, const char *key);
@@ -228,9 +234,5 @@ int				builtin_exit(char **argv);
 
 int				is_valid_identifier(const char *str);
 char			*ft_strndup(const char *s, size_t n);
-
-t_segment	*build_segment(t_token *token, t_gc *gc);
-
-char	*check_for_dollar(t_segment seg, t_env **env, t_gc *gc);
 
 #endif
