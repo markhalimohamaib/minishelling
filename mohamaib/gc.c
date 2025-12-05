@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   gc_utils.c                                         :+:      :+:    :+:   */
+/*   gc.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 15:29:28 by markhali          #+#    #+#             */
-/*   Updated: 2025/10/30 23:05:41 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/02 15:18:02 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,4 +69,28 @@ char	*gc_ft_strdup(const char *str, t_gc *gc)
 	}
 	dup[i] = '\0';
 	return (dup);
+}
+
+char	*gc_ft_strjoin(char const *s1, char const *s2, t_gc *gc)
+{
+	char	*new;
+	int		i;
+	int		j;
+
+	if (!s1 && !s2)
+		return (NULL);
+	new = gc_malloc(sizeof (char) * (ft_strlen(s1) + ft_strlen(s2) + 1), gc);
+	if (!new)
+		return (NULL);
+	i = 0;
+	j = 0;
+	while (s1 && s1[i] != '\0')
+	{
+		new[i] = s1[i];
+		i++;
+	}
+	while (s2 && s2[j] != '\0')
+		new[i++] = s2[j++];
+	new[i] = '\0';
+	return (new);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/07 21:44:13 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/01 23:23:33 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,10 @@ t_token	*create_token(token_type type, char *value, t_gc *gc)
 	new->value = value;
 	new->state = NORMAL;
 	new->expand = 0;
-	new->expand_value = NULL;
+	// new->expand_value = NULL;
+	new->seg_count = 0;
+	new->origin_val = NULL;
+	new->segment = NULL;
 	new->filename = NULL;
 	new->heredoc_del = NULL;
 	new->next = NULL;

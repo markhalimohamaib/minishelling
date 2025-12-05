@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/24 01:18:25 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/02 15:18:28 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,11 +82,28 @@ typedef enum e_token_state
 	IN_DOUBLE
 }	token_state;
 
+// typedef enum e_segment_state
+// {
+// 	NORMAL,
+// 	IN_SINGLE,
+// 	IN_DOUBLE
+// }	segment_state;
+
+typedef struct s_segment
+{
+	char			*str;
+	token_state		seg_state;
+	int				expands;
+}	t_segment;
+
 typedef struct s_token
 {
 	token_type		type;
 	char			*value;
-	char			*expand_value;
+	char			*origin_val;
+	// char			*expand_value;
+	t_segment		*segment;
+	int				seg_count;
 	int				state;
 	int				expand;
 	char			*filename;
@@ -121,6 +138,7 @@ void			gc_init(t_gc *gc);
 void			*gc_malloc(size_t size, t_gc *gc);
 void			gc_free_all(t_gc *gc);
 char			*gc_ft_strdup(const char *str, t_gc *gc);
+char			*gc_ft_strjoin(char const *s1, char const *s2, t_gc *gc);
 
 /* tokenizer.c */
 int				word_len(char *str, int i);
@@ -132,7 +150,7 @@ t_token			*tokenize_input(char *str, t_gc *gc);
 /* tokenizer_words.c */
 char			*extract_word(char *str, int *i, int size, t_gc *gc);
 void			handle_expansion_char(t_token *token, char *str, int *i,
-					int *j, int *w, char *result, char *expan);
+					int *j, char *result);
 char			*remove_quotes_and_track(t_token *token, char *str,
 					int size, t_gc *gc);
 void			handle_quoted_word(char *str, t_token **head, int *i, t_gc *gc);
@@ -210,5 +228,9 @@ int				builtin_exit(char **argv);
 
 int				is_valid_identifier(const char *str);
 char			*ft_strndup(const char *s, size_t n);
+
+t_segment	*build_segment(t_token *token, t_gc *gc);
+
+void	check_for_dollar(t_segment seg, t_gc *gc);
 
 #endif

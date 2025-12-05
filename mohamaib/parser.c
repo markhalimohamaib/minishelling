@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/22 20:49:50 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/02 15:18:47 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ int	count_cmd_words(t_token *head)
 char	**build_cmd_array(t_token **head, t_gc *gc)
 {
 	int		i;
+	int		j;
 	char	**cmd;
 	t_token	*tmp;
 
@@ -85,8 +86,19 @@ char	**build_cmd_array(t_token **head, t_gc *gc)
 	cmd = gc_malloc((sizeof(char *) * (count_cmd_words(*head) + 1)), gc);
 	while (tmp && tmp->type != T_PIPE)
 	{
+		j = 0;
+		cmd[i] = gc_ft_strdup("\0", gc);
 		if (tmp->type == T_WORD)
-			cmd[i++] = gc_ft_strdup(tmp->value, gc);
+		{
+			while(tmp->segment[j].str)
+			{
+				// if (tmp->segment[j].expands == 1)
+				// 	check_for_dollar(tmp->segment[j], gc);
+				cmd[i] = gc_ft_strjoin(cmd[i], tmp->segment[j].str, gc);
+				j++;
+			}
+			i++;
+		}
 		tmp = tmp->next;
 	}
 	cmd[i] = NULL;

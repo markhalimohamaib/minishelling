@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/16 18:43:44 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/24 01:18:20 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/02 15:36:26 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,6 +218,13 @@ void	execute(t_node *node, t_env **env, t_gc *gc)
 	envp = env_to_array((*env), gc);
 	path = get_path(envp, gc);
 	dirs = gc_ft_split(path, ':', gc);
+	cmd  = gc_ft_strdup(node->cmd[0], gc);
+	if (strchr(cmd, '/'))
+	{
+		execve(cmd, node->cmd, envp);
+		perror(cmd);
+		exit(0);
+	}
 	while (dirs[i])
 	{
 		cmd = ft_strjoin_plus(dirs[i], "/", node->cmd[0]);
