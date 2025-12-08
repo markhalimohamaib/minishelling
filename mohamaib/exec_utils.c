@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/16 18:43:44 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/05 22:02:02 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/07 23:40:33 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,8 +235,8 @@ void	execute(t_node *node, t_env **env, t_gc *gc)
 			exit(0);
 		}
 		i++;
-		free(cmd);
 	}
+	printf("%s: command not found\n", node->cmd[0]);
 	exit(127);
 }
 

@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/05 23:16:56 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/07 18:26:10 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -201,6 +201,7 @@ int				execute_command(t_node *node, t_env **env, t_gc *gc);
 
 /* exec_utils.c */
 int				exec_cmd(t_node *node, t_env **env, t_gc *gc);
+char			*ft_strjoin_plus(char const *s1, char const *s2, char const *s3, t_gc *gc);
 
 /* exec_utils2.c */
 int				execute_pipe(t_node *node, t_env **env, t_gc *gc);

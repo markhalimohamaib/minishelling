@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/06 00:31:48 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/02 15:13:58 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/06 20:25:32 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,8 @@ void print_token_details(t_token *token)
     while (token->segment && token->segment[i].str != NULL)
     {
         printf(" | (seg_str[%d]=%s", i, token->segment[i].str);
-        printf(" | seg_st=%d", token->segment[i].seg_state);
-		printf(" | expands=%d)", token->segment[i].expands);
+        printf(" , seg_st=%d", token->segment[i].seg_state);
+		printf(" , expands=%d)", token->segment[i].expands);
         i++;
     }
 
