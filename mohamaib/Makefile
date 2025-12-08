@@ -6,7 +6,7 @@
 #    By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#              #
-#    Updated: 2025/11/24 21:44:26 by mohamaib         ###   ########.fr        #
+#    Updated: 2025/12/05 22:03:34 by mohamaib         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,7 +29,9 @@ SRCS		= main.c \
 			  exec.c \
 			  exec_utils.c \
 			  exec_utils2.c \
-			  exec_utils3.c
+			  exec_utils3.c \
+			  segment_build.c \
+			  expansions.c
 
 BUILTIN_DIR	= builtins
 BUILTIN_SRCS = $(BUILTIN_DIR)/builtin_cd.c \

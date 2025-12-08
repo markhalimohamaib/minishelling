@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/05 23:59:59 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/05 20:54:35 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ char	*extract_word(char *str, int *i, int size, t_gc *gc)
 }
 
 void	handle_expansion_char(t_token *token, char *str, int *i,
-			int *j, int *w, char *result, char *expan)
+			int *j, char *result)
 {
 	int	start_i;
 
@@ -52,11 +52,11 @@ void	handle_expansion_char(t_token *token, char *str, int *i,
 			&& str[*i] != ' ' && str[*i] != '\t'
 			&& str[*i] != '|' && str[*i] != '<' && str[*i] != '>')
 		{
-			expan[(*w)++] = str[*i];
+			// expan[(*w)++] = str[*i];
 			result[(*j)++] = str[(*i)++];
 		}
 		if (*i > start_i)
-			token->expand = 1;
+			token->expand_line = 1;
 	}
 	else
 		result[(*j)++] = str[(*i)++];
@@ -66,17 +66,17 @@ char	*remove_quotes_and_track(t_token *token, char *str, int size, t_gc *gc)
 {
 	int		i;
 	int		j;
-	int		w;
+	// int		w;
 	char	*result;
-	char	*expan;
+	// char	*expan;
 
 	i = 0;
 	j = 0;
-	w = 0;
+	// w = 0;
 	token->state = NORMAL;
-	token->expand = 0;
+	token->expand_line = 0;
 	result = gc_malloc(sizeof(char) * (size + 1), gc);
-	expan = gc_malloc(sizeof(char) * (size + 1), gc);
+	// expan = gc_malloc(sizeof(char) * (size + 1), gc);
 	while (str[i])
 	{
 		if (token->state == NORMAL && (str[i] == '\'' || str[i] == '\"'))
@@ -92,15 +92,15 @@ char	*remove_quotes_and_track(t_token *token, char *str, int size, t_gc *gc)
 			token->state = NORMAL;
 		else
 		{
-			handle_expansion_char(token, str, &i, &j, &w, result, expan);
+			handle_expansion_char(token, str, &i, &j, result);
 			continue ;
 		}
 		i++;
 	}
 	result[j] = '\0';
-	expan[w] = '\0';
-	if (w > 0)
-		token->expand_value = expan;
+	// expan[w] = '\0';
+	// if (w > 0)
+	// 	token->expand_value = expan;
 	return (result);
 }
 
@@ -113,6 +113,8 @@ void	handle_quoted_word(char *str, t_token **head, int *i, t_gc *gc)
 	size = word_len(str, (*i));
 	word = extract_word(str, i, size, gc);
 	token = create_token(T_WORD, NULL, gc);
+	token->origin_val = gc_ft_strdup(word, gc);
+	token->segment = build_segment(token, gc);
 	token->value = remove_quotes_and_track(token, word, size, gc);
 	add_token_to_list(head, token);
 }
@@ -133,6 +135,8 @@ void	handle_regular_word(char *str, t_token **head, int *i, t_gc *gc)
 		word[j++] = str[(*i)++];
 	word[j] = '\0';
 	token = create_token(T_WORD, NULL, gc);
+	token->origin_val = gc_ft_strdup(word, gc);
+	token->segment = build_segment(token, gc);
 	token->value = remove_quotes_and_track(token, word, size, gc);
 	add_token_to_list(head, token);
 }

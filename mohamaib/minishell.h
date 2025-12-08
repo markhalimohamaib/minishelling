@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/24 01:18:25 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/07 18:26:10 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,13 +82,30 @@ typedef enum e_token_state
 	IN_DOUBLE
 }	token_state;
 
+// typedef enum e_segment_state
+// {
+// 	NORMAL,
+// 	IN_SINGLE,
+// 	IN_DOUBLE
+// }	segment_state;
+
+typedef struct s_segment
+{
+	char			*str;
+	token_state		seg_state;
+	int				expands;
+}	t_segment;
+
 typedef struct s_token
 {
 	token_type		type;
 	char			*value;
-	char			*expand_value;
+	char			*origin_val;
+	// char			*expand_value;
+	t_segment		*segment;
+	int				seg_count;
 	int				state;
-	int				expand;
+	int				expand_line;
 	char			*filename;
 	char			*heredoc_del;
 	struct s_token	*next;
@@ -121,6 +138,7 @@ void			gc_init(t_gc *gc);
 void			*gc_malloc(size_t size, t_gc *gc);
 void			gc_free_all(t_gc *gc);
 char			*gc_ft_strdup(const char *str, t_gc *gc);
+char			*gc_ft_strjoin(char const *s1, char const *s2, t_gc *gc);
 
 /* tokenizer.c */
 int				word_len(char *str, int i);
@@ -132,7 +150,7 @@ t_token			*tokenize_input(char *str, t_gc *gc);
 /* tokenizer_words.c */
 char			*extract_word(char *str, int *i, int size, t_gc *gc);
 void			handle_expansion_char(t_token *token, char *str, int *i,
-					int *j, int *w, char *result, char *expan);
+					int *j, char *result);
 char			*remove_quotes_and_track(t_token *token, char *str,
 					int size, t_gc *gc);
 void			handle_quoted_word(char *str, t_token **head, int *i, t_gc *gc);
@@ -147,14 +165,14 @@ t_node			*create_redir_node(token_type type, char *filename,
 					t_node *left, t_gc *gc);
 t_node			*create_pipe_node(t_node *left, t_node *right, t_gc *gc);
 int				count_cmd_words(t_token *head);
-char			**build_cmd_array(t_token **head, t_gc *gc);
+char			**build_cmd_array(t_token **head, t_env **env, t_gc *gc);
 
 /* parser_build.c */
 t_token			*find_last_redir(t_token *start);
 t_node			*wrap_with_redir(t_token *redir, t_node *node, t_gc *gc);
 void			skip_to_pipe(t_token **head);
-t_node			*parse_simple_cmd(t_token **head, t_gc *gc);
-t_node			*parse_pipeline(t_token **head, t_gc *gc);
+t_node			*parse_simple_cmd(t_token **head, t_env **env, t_gc *gc);
+t_node			*parse_pipeline(t_token **head, t_env **env, t_gc *gc);
 
 /* ast_print.c */
 void			print_indent(int depth);
@@ -183,6 +201,7 @@ int				execute_command(t_node *node, t_env **env, t_gc *gc);
 
 /* exec_utils.c */
 int				exec_cmd(t_node *node, t_env **env, t_gc *gc);
+char			*ft_strjoin_plus(char const *s1, char const *s2, char const *s3, t_gc *gc);
 
 /* exec_utils2.c */
 int				execute_pipe(t_node *node, t_env **env, t_gc *gc);
@@ -192,6 +211,12 @@ int				handle_redir_in(t_node *node, t_env **env, t_gc *gc);
 int				handle_redir_out(t_node *node, t_env **env, t_gc *gc);
 int				handle_redir_append(t_node *node, t_env **env, t_gc *gc);
 int				handle_redir_heredoc(t_node *node, t_env **env, t_gc *gc);
+
+/* segment_build.c */
+t_segment		*build_segment(t_token *token, t_gc *gc);
+
+/* expansions.c */
+char			*check_for_dollar(t_segment seg, t_env **env, t_gc *gc);
 
 /* ./builtins */
 t_env			*init_env(char **envp);

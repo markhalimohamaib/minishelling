@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/06 00:31:48 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/06 00:31:50 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/06 20:25:32 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,18 +31,29 @@ const char	*token_type_name(token_type type)
 	return ("UNKNOWN");
 }
 
-void	print_token_details(t_token *token)
+void print_token_details(t_token *token)
 {
-	if (token->state)
-		printf(" | state=%d", token->state);
-	if (token->expand)
-		printf(" | expand=%d", token->expand);
-	if (token->expand_value && (token->expand_value[0] != '\0'))
-		printf(" | expand_value=%s", token->expand_value);
-	if (token->filename)
-		printf(" | filename=%s", token->filename);
-	if (token->heredoc_del)
-		printf(" | heredoc_del=%s", token->heredoc_del);
+    int i = 0;
+
+    if (token->state)
+        printf(" | state=%d", token->state);
+    // if (token->expand)
+    //     printf(" | expand=%d", token->expand);
+    if (token->origin_val && token->origin_val[0] != '\0')
+        printf(" | origin_val=%s", token->origin_val);
+
+    while (token->segment && token->segment[i].str != NULL)
+    {
+        printf(" | (seg_str[%d]=%s", i, token->segment[i].str);
+        printf(" , seg_st=%d", token->segment[i].seg_state);
+		printf(" , expands=%d)", token->segment[i].expands);
+        i++;
+    }
+
+    if (token->filename)
+        printf(" | filename=%s", token->filename);
+    if (token->heredoc_del)
+        printf(" | heredoc_del=%s", token->heredoc_del);
 }
 
 void	print_token_list(t_token *head)

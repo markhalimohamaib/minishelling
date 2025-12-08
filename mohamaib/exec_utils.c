@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/16 18:43:44 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/24 01:18:20 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/07 23:40:33 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ char	**gc_ft_split(char const *s, char c, t_gc *gc)
 	return (big);
 }
 
-char	*ft_strjoin_plus(char const *s1, char const *s2, char const *s3)
+char	*ft_strjoin_plus(char const *s1, char const *s2, char const *s3, t_gc *gc)
 {
 	char	*new;
 	int		i;
@@ -90,8 +90,8 @@ char	*ft_strjoin_plus(char const *s1, char const *s2, char const *s3)
 
 	if (!s1 && !s2)
 		return (NULL);
-	new = (char *)malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2)
-				+ ft_strlen(s3) + 1));
+	new = gc_malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2)
+				+ ft_strlen(s3) + 1), gc);
 	if (!new)
 		return (NULL);
 	i = 0;
@@ -218,9 +218,16 @@ void	execute(t_node *node, t_env **env, t_gc *gc)
 	envp = env_to_array((*env), gc);
 	path = get_path(envp, gc);
 	dirs = gc_ft_split(path, ':', gc);
+	cmd  = gc_ft_strdup(node->cmd[0], gc);
+	if (ft_strchr(cmd, '/'))
+	{
+		execve(cmd, node->cmd, envp);
+		perror(cmd);
+		exit(0);
+	}
 	while (dirs[i])
 	{
-		cmd = ft_strjoin_plus(dirs[i], "/", node->cmd[0]);
+		cmd = ft_strjoin_plus(dirs[i], "/", node->cmd[0], gc);
 		if (access(cmd, X_OK) == 0)
 		{
 			// printf("execution complete1\n");
@@ -228,8 +235,8 @@ void	execute(t_node *node, t_env **env, t_gc *gc)
 			exit(0);
 		}
 		i++;
-		free(cmd);
 	}
+	printf("%s: command not found\n", node->cmd[0]);
 	exit(127);
 }
 
