@@ -33,10 +33,21 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 	tokens = tokenize_input(line, gc);
 	print_token_list(tokens);
 	ast = parse_pipeline(&tokens, env, gc);
+	prepare_heredocs(ast, env, gc);
+	if (ast)
+    {
+        if (heredoc_was_interrupted(ast))
+        {
+            /* cleanup any prepared fds and return to prompt, do not execute AST */
+            cleanup_heredocs(ast);
+            return;
+        }
+    }
 	mark_builtins(ast);
 	print_ast(ast);
 	if (ast)
 		execute_node(ast, env, gc);
+	cleanup_heredocs(ast);
 }
 
 int	main(int argc, char **argv, char **envp)

@@ -31,7 +31,8 @@ SRCS		= main.c \
 			  exec_utils2.c \
 			  exec_utils3.c \
 			  segment_build.c \
-			  expansions.c
+			  expansions.c \
+			  heredoc.c
 
 BUILTIN_DIR	= builtins
 BUILTIN_SRCS = $(BUILTIN_DIR)/builtin_cd.c \

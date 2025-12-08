@@ -24,11 +24,13 @@ t_node	*create_cmd_node(char **cmd, t_gc *gc)
 	node->right = NULL;
 	node->left = NULL;
 	node->builtin = BLT_NONE;
+	node->heredoc_fd = -1;
+	node->heredoc_no_expand = 0;
 	return (node);
 }
 
 t_node	*create_redir_node(token_type type, char *filename,
-						t_node *left, t_gc *gc)
+						t_node *left, int heredoc_no_expand, t_gc *gc)
 {
 	t_node	*node;
 
@@ -40,6 +42,8 @@ t_node	*create_redir_node(token_type type, char *filename,
 	node->left = left;
 	node->right = NULL;
 	node->builtin = BLT_NONE;
+	node->heredoc_fd = -1;
+	node->heredoc_no_expand = heredoc_no_expand;
 	return (node);
 }
 
@@ -55,6 +59,8 @@ t_node	*create_pipe_node(t_node *left, t_node *right, t_gc *gc)
 	node->filename = NULL;
 	node->redir_type = 0;
 	node->builtin = BLT_NONE;
+	node->heredoc_fd = -1;
+	node->heredoc_no_expand = 0;
 	return (node);
 }
 

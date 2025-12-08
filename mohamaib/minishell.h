@@ -126,6 +126,8 @@ typedef struct s_node
 	struct s_node	*left;
 	struct s_node	*right;
 	t_builtin_type	builtin;
+	int				heredoc_fd;
+	int             heredoc_no_expand;
 }	t_node;
 
 // typedef struct s_child
@@ -162,7 +164,7 @@ void			process_redir_target(t_token *token, char *str,
 /* parser.c */
 t_node			*create_cmd_node(char **cmd, t_gc *gc);
 t_node			*create_redir_node(token_type type, char *filename,
-					t_node *left, t_gc *gc);
+						t_node *left, int heredoc_no_expand, t_gc *gc);
 t_node			*create_pipe_node(t_node *left, t_node *right, t_gc *gc);
 int				count_cmd_words(t_token *head);
 char			**build_cmd_array(t_token **head, t_env **env, t_gc *gc);
@@ -235,5 +237,15 @@ int				builtin_exit(char **argv);
 
 int				is_valid_identifier(const char *str);
 char			*ft_strndup(const char *s, size_t n);
+
+/* heredoc.c */
+void			prepare_heredocs(t_node *node, t_env **env, t_gc *gc);
+void			cleanup_heredocs(t_node *node);
+int				write_heredoc_content(int fd, char *delimiter, int expand, t_env **env, t_gc *gc);
+void			apply_redirections(t_node *node, t_env **env, t_gc *gc);
+int				heredoc_was_interrupted(t_node *node);
+
+/* read_heredoc.c */
+char			*read_heredoc(char *delimiter, int expands, t_env **env, int num);
 
 #endif
