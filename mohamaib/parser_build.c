@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_build.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/05 21:41:01 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/10 20:31:22 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,18 +32,13 @@ t_token	*find_last_redir(t_token *start)
 t_node	*wrap_with_redir(t_token *redir, t_node *node, t_gc *gc)
 {
 	if (redir->filename)
-		return (create_redir_node(redir->type, redir->filename, node, 0, gc));
+		return (create_redir_node(redir->type, redir, node, gc));
 	else if (redir->heredoc_del)
 	{
-		int no_expand = 0;
-    	if (redir->state == IN_SINGLE || redir->state == IN_DOUBLE)
-		{
-			no_expand = 1;
-		}
-		return (create_redir_node(redir->type, redir->heredoc_del, node, no_expand, gc));
+		return (create_redir_node(redir->type, redir, node, gc));
 	}
 	else
-		return (create_redir_node(redir->type, "", node, 0, gc));
+		return (create_redir_node(redir->type, redir, node, gc));
 }
 
 void	skip_to_pipe(t_token **head)
@@ -71,7 +66,7 @@ t_node	*parse_simple_cmd(t_token **head, t_env **env, t_gc *gc)
 	return (node);
 }
 
-t_node	*parse_pipeline(t_token **head, t_env ** env, t_gc *gc)
+t_node	*parse_pipeline(t_token **head, t_env **env, t_gc *gc)
 {
 	t_node	*left;
 	t_node	*right;

@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 13:31:55 by markhali          #+#    #+#             */
-/*   Updated: 2025/11/12 13:32:20 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/10 20:46:01 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,10 +73,7 @@ t_env	*init_env(char **envp)
 		node = new_env_node(envp[i], eq + 1);
 		*eq = '=';
 		if (!node)
-		{
-			free_env(head);
-			return (NULL);
-		}
+			return (free_env(head), NULL);
 		add_env_node(&head, &tail, node);
 		i++;
 	}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansions.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/30 20:00:26 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/08 02:51:58 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/10 19:56:29 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,14 +145,15 @@ char	*check_for_dollar(t_segment seg, t_env **env, t_gc *gc)
 		if (seg.str[i] == '$')
 			i++;
 		while (seg.str[i] && seg.str[i] != '\'' && seg.str[i] != ' '
-			&& seg.str[i] != '/' && seg.str[i] != '@' && seg.str[i] != ','
-			&& seg.str[i] != '.' && seg.str[i] != '?' && seg.str[i] != '#'
-			&& seg.str[i] != '^' && seg.str[i] != '&' && seg.str[i] != '*'
-			&& seg.str[i] != ')' && seg.str[i] != '(' && seg.str[i] != '{'
-			&& seg.str[i] != '}' && seg.str[i] != '-' && seg.str[i] != '+'
-			&& seg.str[i] != '=' && seg.str[i] != ':' && seg.str[i] != ';'
-			&& seg.str[i] != '\\' && seg.str[i] != '~' && seg.str[i] != '|'
-			&& seg.str[i] != '<' && seg.str[i] != '>' && seg.str[i] != '$')
+			&& seg.str[i] != '\"' && seg.str[i] != '/' && seg.str[i] != '@'
+			&& seg.str[i] != ',' && seg.str[i] != '.' && seg.str[i] != '?'
+			&& seg.str[i] != '#' && seg.str[i] != '^' && seg.str[i] != '&'
+			&& seg.str[i] != '*' && seg.str[i] != ')' && seg.str[i] != '('
+			&& seg.str[i] != '{' && seg.str[i] != '}' && seg.str[i] != '-'
+			&& seg.str[i] != '+' && seg.str[i] != '=' && seg.str[i] != ':'
+			&& seg.str[i] != ';' && seg.str[i] != '\\' && seg.str[i] != '~'
+			&& seg.str[i] != '|' && seg.str[i] != '<' && seg.str[i] != '>'
+			&& seg.str[i] != '$')
 			expand_val[j++] = seg.str[i++];
 		expand_val[j] = '\0';
 		z = i;

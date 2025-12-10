@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/05 20:54:42 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/10 20:32:05 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void	add_token_to_list(t_token **head, t_token *new)
 	tmp->next = new;
 }
 
-t_token	*create_token(token_type type, char *value, t_gc *gc)
+t_token	*create_token(t_token_type type, char *value, t_gc *gc)
 {
 	t_token	*new;
 
@@ -77,6 +77,7 @@ t_token	*create_token(token_type type, char *value, t_gc *gc)
 	new->segment = NULL;
 	new->filename = NULL;
 	new->heredoc_del = NULL;
+	new->herdoc_expand = 0;
 	new->next = NULL;
 	return (new);
 }

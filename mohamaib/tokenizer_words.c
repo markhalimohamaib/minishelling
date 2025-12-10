@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer_words.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/05 20:54:35 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/10 17:04:27 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,8 +146,12 @@ void	process_redir_target(t_token *token, char *str, int *i, t_gc *gc)
 	int		size;
 	char	*target;
 
+	token->herdoc_expand = 1;
 	size = word_len(str, (*i));
 	target = extract_word(str, i, size, gc);
+	if ((target[0] == '\'' && target[ft_strlen(target) - 1] == '\'') ||
+		(target[0] == '"' && target[ft_strlen(target) - 1] == '"'))
+		token->herdoc_expand = 0;
 	target = remove_quotes_and_track(token, target, size, gc);
 	if (token->type == T_HEREDOC)
 		token->heredoc_del = target;

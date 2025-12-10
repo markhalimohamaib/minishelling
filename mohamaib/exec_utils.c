@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/16 18:43:44 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/07 23:40:33 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/10 20:08:04 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ char	*allocate(const char *s, int start, int len, t_gc *gc)
 	char	*ptr;
 
 	i = 0;
-	ptr = gc_malloc(sizeof (char) * (len + 1), gc);
+	ptr = gc_malloc(sizeof(char) * (len + 1), gc);
 	if (!ptr)
 		return (NULL);
 	while (s[start] && i < len)
@@ -62,7 +62,7 @@ char	**gc_ft_split(char const *s, char c, t_gc *gc)
 
 	i = 0;
 	j = 0;
-	big = gc_malloc(sizeof (char *) * (countwords(s, c) + 1), gc);
+	big = gc_malloc(sizeof(char *) * (countwords(s, c) + 1), gc);
 	if (!big)
 		return (NULL);
 	while (s[i])
@@ -81,7 +81,8 @@ char	**gc_ft_split(char const *s, char c, t_gc *gc)
 	return (big);
 }
 
-char	*ft_strjoin_plus(char const *s1, char const *s2, char const *s3, t_gc *gc)
+char	*ft_strjoin_plus(char const *s1, char const *s2, char const *s3,
+		t_gc *gc)
 {
 	char	*new;
 	int		i;
@@ -211,14 +212,14 @@ void	execute(t_node *node, t_env **env, t_gc *gc)
 	int		i;
 	char	*cmd;
 	char	**envp;
-	char 	*path;
+	char	*path;
 	char	**dirs;
 
 	i = 0;
 	envp = env_to_array((*env), gc);
 	path = get_path(envp, gc);
 	dirs = gc_ft_split(path, ':', gc);
-	cmd  = gc_ft_strdup(node->cmd[0], gc);
+	cmd = gc_ft_strdup(node->cmd[0], gc);
 	if (ft_strchr(cmd, '/'))
 	{
 		execve(cmd, node->cmd, envp);
@@ -253,5 +254,5 @@ int	exec_cmd(t_node *node, t_env **env, t_gc *gc)
 		execute(node, env, gc);
 	// printf("cmd not found2\n");
 	waitpid(node->pid1, NULL, 0);
-	return(1);
+	return (1);
 }

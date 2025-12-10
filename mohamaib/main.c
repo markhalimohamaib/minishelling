@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/05 21:37:51 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/10 20:46:46 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ int	should_exit(char *line)
 {
 	if (!line)
 		return (1);
-	if (ft_strncmp(line, "exit", 4) == 0 && (line[4] == '\0'
-			|| line[4] == ' ' || line[4] == '\t'))
+	if (ft_strncmp(line, "exit", 4) == 0 && (line[4] == '\0' || line[4] == ' '
+			|| line[4] == '\t'))
 		return (1);
 	return (0);
 }
@@ -34,15 +34,6 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 	print_token_list(tokens);
 	ast = parse_pipeline(&tokens, env, gc);
 	prepare_heredocs(ast, env, gc);
-	if (ast)
-    {
-        if (heredoc_was_interrupted(ast))
-        {
-            /* cleanup any prepared fds and return to prompt, do not execute AST */
-            cleanup_heredocs(ast);
-            return;
-        }
-    }
 	mark_builtins(ast);
 	print_ast(ast);
 	if (ast)
@@ -61,10 +52,7 @@ int	main(int argc, char **argv, char **envp)
 	gc_init(&gc);
 	env = init_env(envp);
 	if (!env)
-	{
-		ft_putstr_fd("minishell: failed to initialize environment\n", 2);
-		return (1);
-	}
+		return (ft_putstr_fd("minishell: failed to initialize environment\n", 2), 1);
 	while (1)
 	{
 		line = readline("minishell$ ");

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parserv2.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 18:51:06 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/05 23:42:41 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/10 16:32:47 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -287,19 +287,19 @@ t_node	*create_nodes(t_token **head, char **cmd, t_gc *gc)
 	return (node);
 }
 
-t_node	*create_redir_node(token_type type, char *filename, t_node *left, t_gc *gc)
-{
-	t_node	*node;
+// t_node	*create_redir_node(token_type type, char *filename, t_node *left, t_gc *gc)
+// {
+// 	t_node	*node;
 
-	node = gc_malloc(sizeof(t_node), gc);
-	node->type = REDIR_NODE;
-	node->cmd = NULL;
-	node->filename = gc_ft_strdup(filename, gc);
-	node->redir_type = type;
-	node->left = left;
-	node->right = NULL;
-	return (node);
-}
+// 	node = gc_malloc(sizeof(t_node), gc);
+// 	node->type = REDIR_NODE;
+// 	node->cmd = NULL;
+// 	node->filename = gc_ft_strdup(filename, gc);
+// 	node->redir_type = type;
+// 	node->left = left;
+// 	node->right = NULL;
+// 	return (node);
+// }
 
 void	skip_to_pipe(t_token **head)
 {

@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/11/08 18:25:01 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/10 20:32:19 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ void	print_cmd_array(char **cmd)
 	}
 }
 
-void	print_redir_type(token_type type, char *filename)
+void	print_redir_type(t_token_type type, char *filename)
 {
 	if (type == T_REDIR_OUT)
 		printf("> %s\n", filename);

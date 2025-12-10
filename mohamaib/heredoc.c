@@ -1,210 +1,191 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   heredoc.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/12/10 10:51:13 by markhali          #+#    #+#             */
+/*   Updated: 2025/12/10 20:07:32 by markhali         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	is_delimiter(char *line, char *delimiter)
+int	read_heredoc(const char *delim, int expand, t_env **env, t_gc *gc)
 {
-	int	i;
+	int			p[2];
+	char		*line;
+	char		*expanded;
+	t_segment	seg;
 
-	i = 0;
-	while (delimiter[i] && line[i])
+	if (pipe(p) == -1)
 	{
-		if (delimiter[i] != line[i])
-			return (0);
-		i++;
+		perror("minishell: pipe");
+		return (-1);
 	}
-	if (delimiter[i] == '\0' && line[i] == '\0')
-		return (1);
-	return (0);
+	while (1)
+	{
+		line = readline("> ");
+		if (!line)
+		{
+			/* EOF before delimiter
+				-> print warning like bash and stop reading */
+			write(2,
+				"minishell: warning: here-document delimited by end-of-file (wanted `",
+				69);
+			write(2, delim, ft_strlen(delim));
+			write(2, "')\n", 3);
+			break ;
+		}
+		if (ft_strcmp(line, delim) == 0)
+		{
+			free(line);
+			break ;
+		}
+		if (expand)
+		{
+			seg.str = line;
+			seg.seg_state = NORMAL;
+			seg.expands = 1;
+			expanded = check_for_dollar(seg, env, gc); /* GC-allocated */
+			if (expanded && expanded[0] != '\0')
+				write(p[1], expanded, ft_strlen(expanded));
+			write(p[1], "\n", 1);
+			free(line);
+			/* expanded is GC-managed — do not free here */
+		}
+		else
+		{
+			write(p[1], line, ft_strlen(line));
+			write(p[1], "\n", 1);
+			free(line);
+		}
+	}
+	/* close writer end and return the reader */
+	close(p[1]);
+	return (p[0]);
 }
 
-static volatile sig_atomic_t heredoc_interrupted = 0;
-
-static void heredoc_sigint_handler(int sig)
+void	prepare_heredocs(t_node *n, t_env **env, t_gc *gc)
 {
-    (void)sig;
-    heredoc_interrupted = 1;
+	if (!n)
+		return ;
+	/* process current node first (pre-order) so we read heredocs in the same
+		order they appear in the command line tokens */
+	if (n->type == REDIR_NODE && n->redir_type == T_HEREDOC)
+	{
+		/* node->filename holds the delimiter (parser already stripped quotes) */
+		n->heredoc_fd = read_heredoc(n->filename, n->heredoc_expand, env, gc);
+		/* if read_heredoc failed it returns -1; we keep that sentinel */
+	}
+	prepare_heredocs(n->left, env, gc);
+	prepare_heredocs(n->right, env, gc);
 }
 
-/* Returns:
-   0 = success (delimiter seen)
-   1 = interrupted by SIGINT (Ctrl-C) - caller should abort execution
-   2 = EOF encountered before delimiter (warning already printed) */
-int write_heredoc_content(int fd, char *delimiter, int expand, t_env **env, t_gc *gc)
+void	apply_redirs(t_node *n, t_env **env, t_gc *gc)
 {
-    char *line;
-    char *out;
-    t_segment seg;
-    struct sigaction sa_old, sa_new;
+	int	fd;
 
-    /* install simple SIGINT handler to detect Ctrl-C */
-    heredoc_interrupted = 0;
-    sa_new.sa_handler = heredoc_sigint_handler;
-    sigemptyset(&sa_new.sa_mask);
-    sa_new.sa_flags = 0;
-    sigaction(SIGINT, &sa_new, &sa_old);
-
-    while (1)
-    {
-        if (heredoc_interrupted)
-        {
-            /* user hit Ctrl-C while entering heredoc */
-            sigaction(SIGINT, &sa_old, NULL);
-            return (1);
-        }
-
-        line = readline("> ");
-        if (!line)
-        {
-            /* EOF: print warning like bash and return special code 2 */
-            write(2, "minishell: warning: here-document delimited by end-of-file (wanted `", 69);
-            write(2, delimiter, ft_strlen(delimiter));
-            write(2, "')\n", 3);
-            sigaction(SIGINT, &sa_old, NULL);
-            return (2);
-        }
-        if (is_delimiter(line, delimiter))
-        {
-            free(line);
-            sigaction(SIGINT, &sa_old, NULL);
-            return (0); /* normal */
-        }
-
-        if (expand)
-        {
-            seg.str = line;
-            seg.seg_state = NORMAL;
-            seg.expands = 1;
-            out = check_for_dollar(seg, env, gc);
-            if (out && out[0] != '\0')
-                write(fd, out, ft_strlen(out));
-            write(fd, "\n", 1);
-            free(line);
-            /* out is GC-managed */
-        }
-        else
-        {
-            write(fd, line, ft_strlen(line));
-            write(fd, "\n", 1);
-            free(line);
-        }
-    }
+	if (!n)
+		return ;
+	/* first apply the right subtree */
+	apply_redirs(n->right, env, gc);
+	if (n->type == REDIR_NODE)
+	{
+		if (n->redir_type == T_HEREDOC)
+		{
+			if (n->heredoc_fd >= 0)
+			{
+				if (dup2(n->heredoc_fd, STDIN_FILENO) == -1)
+				{
+					perror("minishell: dup2 (heredoc)");
+					exit(1);
+				}
+				close(n->heredoc_fd);
+				n->heredoc_fd = -1;
+			}
+			else
+			{
+				/* fallback: if no prepared fd,
+					try opening a file_fd if present */
+				if (n->file_fd > 0)
+				{
+					if (dup2(n->file_fd, STDIN_FILENO) == -1)
+					{
+						perror("minishell: dup2 (heredoc fallback)");
+						exit(1);
+					}
+					close(n->file_fd);
+					n->file_fd = -1;
+				}
+			}
+		}
+		else if (n->redir_type == T_REDIR_IN)
+		{
+			fd = open(n->filename, O_RDONLY);
+			if (fd < 0)
+			{
+				perror(n->filename);
+				exit(1);
+			}
+			if (dup2(fd, STDIN_FILENO) == -1)
+			{
+				perror("minishell: dup2 (input)");
+				close(fd);
+				exit(1);
+			}
+			close(fd);
+		}
+		else if (n->redir_type == T_REDIR_OUT)
+		{
+			fd = open(n->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			if (fd < 0)
+			{
+				perror(n->filename);
+				exit(1);
+			}
+			if (dup2(fd, STDOUT_FILENO) == -1)
+			{
+				perror("minishell: dup2 (output)");
+				close(fd);
+				exit(1);
+			}
+			close(fd);
+		}
+		else if (n->redir_type == T_REDIR_APPEND)
+		{
+			fd = open(n->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			if (fd < 0)
+			{
+				perror(n->filename);
+				exit(1);
+			}
+			if (dup2(fd, STDOUT_FILENO) == -1)
+			{
+				perror("minishell: dup2 (append)");
+				close(fd);
+				exit(1);
+			}
+			close(fd);
+		}
+	}
+	/* then apply left subtree */
+	apply_redirs(n->left, env, gc);
 }
 
-void collect_heredocs(t_node *node, t_list **list)
+void	cleanup_heredocs(t_node *node)
 {
-    if (!node) return;
-
-    /* Pre-order traversal: visit node first so heredocs are collected
-       in the parser/token appearance order (node, left, right). */
-    if (node->type == REDIR_NODE && node->redir_type == T_HEREDOC)
-        ft_lstadd_back(list, ft_lstnew(node));
-
-    collect_heredocs(node->left, list);
-    collect_heredocs(node->right, list);
-}
-
-
-/* Process heredocs IN ORDER OF APPEARANCE */
-void prepare_heredocs(t_node *root, t_env **env, t_gc *gc)
-{
-    t_list *hdocs = NULL;
-    t_list *tmp;
-    int p[2];
-
-    collect_heredocs(root, &hdocs);
-    tmp = hdocs;
-    while (tmp)
-    {
-        t_node *node = tmp->content;
-
-        if (pipe(p) == -1)
-        {
-            perror("minishell: pipe");
-            /* cleanup any previously prepared fds */
-            // close previous nodes' heredoc_fd if necessary
-            tmp = tmp->next;
-            continue;
-        }
-
-        /* Fork a writer child so readline() and signal handling occur in the child
-           and do not interfere with the main shell process. The child writes into
-           p[1], the parent keeps p[0] as the prepared read end. */
-        pid_t writer = fork();
-        if (writer < 0)
-        {
-            perror("minishell: fork");
-            close(p[0]);
-            close(p[1]);
-            tmp = tmp->next;
-            continue;
-        }
-
-        if (writer == 0)
-        {
-            /* writer child */
-            close(p[0]);
-            int wres = write_heredoc_content(p[1], node->filename,
-                                            !node->heredoc_no_expand, env, gc);
-            close(p[1]);
-            /* use same numeric codes as write_heredoc_content */
-            if (wres == 1)
-                _exit(1);
-            else if (wres == 2)
-                _exit(2);
-            _exit(0);
-        }
-
-        /* parent */
-        close(p[1]);
-        int status;
-        waitpid(writer, &status, 0);
-        int wret = 0;
-        if (WIFEXITED(status))
-            wret = WEXITSTATUS(status);
-
-        if (wret == 1)
-        {
-            /* interrupted by Ctrl-C while entering heredoc */
-            close(p[0]);
-            node->heredoc_fd = -2;
-            return;
-        }
-
-        /* attach read end to node for later use (even if wret == 2: EOF warning already printed) */
-        node->heredoc_fd = p[0];
-
-        tmp = tmp->next;
-    }
-}
-
-void cleanup_heredocs(t_node *node)
-{
-    if (!node)
-        return;
-    cleanup_heredocs(node->left);
-    cleanup_heredocs(node->right);
-
-    if (node->type == REDIR_NODE)
-    {
-        if (node->redir_type == T_HEREDOC && node->heredoc_fd >= 0)
-        {
-            close(node->heredoc_fd);
-            node->heredoc_fd = -1;
-        }
-    }
-}
-
-int heredoc_was_interrupted(t_node *node)
-{
-    if (!node) return 0;
-    if (node->type == REDIR_NODE && node->redir_type == T_HEREDOC)
-    {
-        if (node->heredoc_fd == -2)
-            return 1;
-    }
-    if (heredoc_was_interrupted(node->left))
-        return 1;
-    if (heredoc_was_interrupted(node->right))
-        return 1;
-    return 0;
+	if (!node)
+		return ;
+	cleanup_heredocs(node->left);
+	cleanup_heredocs(node->right);
+	if (node->type == REDIR_NODE)
+	{
+		if (node->redir_type == T_HEREDOC && node->heredoc_fd >= 0)
+		{
+			close(node->heredoc_fd);
+			node->heredoc_fd = -1;
+		}
+	}
 }
