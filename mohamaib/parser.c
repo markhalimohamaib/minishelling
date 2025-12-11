@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/10 20:30:19 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/11 01:43:40 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,12 @@ t_node	*create_redir_node(t_token_type type, t_token *red_tok, t_node *left,
 	node->type = REDIR_NODE;
 	node->cmd = NULL;
 	node->heredoc_expand = red_tok->herdoc_expand;
-	node->filename = gc_ft_strdup(red_tok->filename, gc);
+	if(red_tok->heredoc_del)
+		node->filename = gc_ft_strdup(red_tok->heredoc_del, gc);
+	else if(red_tok->filename)
+		node->filename = gc_ft_strdup(red_tok->filename, gc);
+	else
+		node->filename = NULL;
 	node->redir_type = type;
 	node->left = left;
 	node->right = NULL;
@@ -59,6 +64,7 @@ t_node	*create_pipe_node(t_node *left, t_node *right, t_gc *gc)
 	node->redir_type = 0;
 	node->builtin = BLT_NONE;
 	node->heredoc_fd = -1;
+	node->file_fd = -1;
 	return (node);
 }
 

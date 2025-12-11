@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 10:29:31 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/10 20:08:14 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/11 01:36:11 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,10 +48,11 @@ int	execute_command(t_node *node, t_env **env, t_gc *gc)
 int	execute_node(t_node *node, t_env **env, t_gc *gc)
 {
 	pid_t	pid;
-		int status;
+	int 	status;
 
 	if (!node)
 		return (0);
+	status = 0;
 	if (node->type == PIPE_NODE)
 	{
 		// Pipes will be implemented later

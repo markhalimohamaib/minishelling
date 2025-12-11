@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/10 10:51:13 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/10 20:07:32 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/11 01:33:11 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,7 @@ void	apply_redirs(t_node *n, t_env **env, t_gc *gc)
 
 	if (!n)
 		return ;
+	fd = 0;
 	/* first apply the right subtree */
 	apply_redirs(n->right, env, gc);
 	if (n->type == REDIR_NODE)
