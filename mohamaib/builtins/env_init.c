@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 13:31:55 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/10 20:46:01 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/11 17:18:14 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,31 +50,38 @@ static void	add_env_node(t_env **head, t_env **tail, t_env *node)
 	*tail = node;
 }
 
+static int	process_env_var(char *envp_i, t_env **head, t_env **tail)
+{
+	char	*eq;
+	t_env	*node;
+
+	eq = ft_strchr(envp_i, '=');
+	if (!eq)
+		return (0);
+	*eq = '\0';
+	node = new_env_node(envp_i, eq + 1);
+	*eq = '=';
+	if (!node)
+		return (-1);
+	add_env_node(head, tail, node);
+	return (0);
+}
+
 t_env	*init_env(char **envp)
 {
 	t_env	*head;
 	t_env	*tail;
-	char	*eq;
-	t_env	*node;
 	int		i;
+	int		res;
 
 	head = NULL;
 	tail = NULL;
 	i = 0;
 	while (envp[i])
 	{
-		eq = ft_strchr(envp[i], '=');
-		if (!eq)
-		{
-			i++;
-			continue ;
-		}
-		*eq = '\0';
-		node = new_env_node(envp[i], eq + 1);
-		*eq = '=';
-		if (!node)
+		res = process_env_var(envp[i], &head, &tail);
+		if (res == -1)
 			return (free_env(head), NULL);
-		add_env_node(&head, &tail, node);
 		i++;
 	}
 	return (head);

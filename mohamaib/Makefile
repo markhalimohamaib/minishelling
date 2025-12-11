@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+         #
+#    By: markhali <markhali@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#              #
-#    Updated: 2025/12/05 22:03:34 by mohamaib         ###   ########.fr        #
+#    Updated: 2025/12/11 19:47:17 by markhali         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,18 +21,24 @@ SRCS		= main.c \
 			  gc.c \
 			  tokenizer.c \
 			  tokenizer_words.c \
+			  tokenizer_helper.c \
 			  parser.c \
 			  parser_build.c \
+			  parser_helper.c \
 			  ast_print.c \
 			  token_print.c \
 			  builtin_utils.c \
 			  exec.c \
 			  exec_utils.c \
+			  exec_helper.c \
 			  exec_utils2.c \
 			  exec_utils3.c \
 			  segment_build.c \
+			  segment_count.c \
 			  expansions.c \
-			  heredoc.c
+			  heredoc.c \
+			  read_heredoc.c \
+			  heredoc_redir.c
 
 BUILTIN_DIR	= builtins
 BUILTIN_SRCS = $(BUILTIN_DIR)/builtin_cd.c \

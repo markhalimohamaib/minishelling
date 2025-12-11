@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 10:29:31 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/11 01:36:11 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/11 18:38:56 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,55 +35,43 @@ int	execute_command(t_node *node, t_env **env, t_gc *gc)
 {
 	if (!node || !node->cmd || !node->cmd[0])
 		return (0);
-	// For now, only execute built-ins
 	if (node->builtin != BLT_NONE)
 		return (execute_builtin(node, env));
-	// External commands will be implemented later
 	if (node->builtin == BLT_NONE)
 		return (exec_cmd(node, env, gc));
 	printf("minishell: command not found: %s\n", node->cmd[0]);
 	return (127);
 }
 
-int	execute_node(t_node *node, t_env **env, t_gc *gc)
+static int	handle_redir_node(t_node *node, t_env **env, t_gc *gc)
 {
 	pid_t	pid;
-	int 	status;
+	int		status;
 
+	pid = fork();
+	if (pid < 0)
+	{
+		perror("minishell: fork");
+		return (1);
+	}
+	if (pid == 0)
+	{
+		apply_redirs(node, env, gc);
+		exit(execute_node(node->left, env, gc));
+	}
+	waitpid(pid, &status, 0);
+	return (status >> 8);
+}
+
+int	execute_node(t_node *node, t_env **env, t_gc *gc)
+{
 	if (!node)
 		return (0);
-	status = 0;
 	if (node->type == PIPE_NODE)
-	{
-		// Pipes will be implemented later
-		// printf("Note: Pipeline detected but not yet implemented\n");
-		// For now, just execute left side
-		// if (node->left)
-		// 	execute_node(node->left, env, gc);
-		// if (node->right)
-		// 	execute_node(node->right, env, gc);
 		return (execute_pipe(node, env, gc));
-	}
-	else if (node->type == REDIR_NODE)
-	{
-		pid = fork();
-		if (pid < 0)
-		{
-			perror("minishell: fork");
-			return (1);
-		}
-		if (pid == 0)
-		{
-			/* child: apply redirections then execute the inner command */
-			apply_redirs(node, env, gc);
-			/* Note: execute_node may fork again for CMD/PIPE; if it returns,
-				exit with the code */
-			exit(execute_node(node->left, env, gc));
-		}
-		waitpid(pid, &status, 0);
-		return (status >> 8);
-	}
-	else if (node->type == CMD_NODE)
+	if (node->type == REDIR_NODE)
+		return (handle_redir_node(node, env, gc));
+	if (node->type == CMD_NODE)
 		return (execute_command(node, env, gc));
 	return (0);
 }

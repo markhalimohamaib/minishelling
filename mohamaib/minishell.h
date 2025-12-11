@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/11 01:42:30 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/11 19:29:26 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,8 +142,6 @@ t_token					*tokenize_input(char *str, t_gc *gc);
 
 /* tokenizer_words.c */
 char					*extract_word(char *str, int *i, int size, t_gc *gc);
-void					handle_expansion_char(t_token *token, char *str, int *i,
-							int *j, char *result);
 char					*remove_quotes_and_track(t_token *token, char *str,
 							int size, t_gc *gc);
 void					handle_quoted_word(char *str, t_token **head, int *i,
@@ -198,10 +196,23 @@ int						ft_strcmp(const char *s1, const char *s2);
 int						execute_node(t_node *node, t_env **env, t_gc *gc);
 int						execute_command(t_node *node, t_env **env, t_gc *gc);
 
-/* exec_utils.c */
-int						exec_cmd(t_node *node, t_env **env, t_gc *gc);
+/* exec_helper.c */
+int						countwords(const char *s, char c);
+char					*allocate(const char *s, int start, int len, t_gc *gc);
+char					**gc_ft_split(char const *s, char c, t_gc *gc);
 char					*ft_strjoin_plus(char const *s1, char const *s2,
 							char const *s3, t_gc *gc);
+int						env_count(t_env *env);
+
+/* exec_helper2.c */
+void					execute(t_node *node, t_env **env, t_gc *gc);
+int						exec_cmd(t_node *node, t_env **env, t_gc *gc);
+
+/* exec_utils.c */
+char					*env_join_kv(char *key, char *value, t_gc *gc);
+int						env_fill_array(char **arr, t_env *env, t_gc *gc);
+char					**env_to_array(t_env *env, t_gc *gc);
+char					*get_path(char **env, t_gc *gc);
 
 /* exec_utils2.c */
 int						execute_pipe(t_node *node, t_env **env, t_gc *gc);
@@ -217,8 +228,24 @@ int						handle_redir_heredoc(t_node *node, t_env **env,
 /* segment_build.c */
 t_segment				*build_segment(t_token *token, t_gc *gc);
 
+/* segment_count.c */
+int						count_segments(const char *org);
+
 /* expansions.c */
 char					*check_for_dollar(t_segment seg, t_env **env, t_gc *gc);
+
+/* expansions_helper.c */
+char					*expand_one(char *s, int *i, t_env **env, t_gc *gc);
+char					*build_expanded(char *s, int *i, t_env **env, t_gc *gc);
+char					*expand_all_dollars(t_segment seg, t_env **env,
+							t_gc *gc);
+
+/* expansion_helper2.c */
+int						is_expandable_char(char c);
+int						get_expandable_size_str(char *s, int i);
+char					*gc_ft_strndup(char *s, int n, t_gc *gc);
+int						count_dollars(t_segment seg);
+char					*replace_val_in_env(char *key, t_env **env, t_gc *gc);
 
 /* ./builtins */
 t_env					*init_env(char **envp);
@@ -242,8 +269,17 @@ char					*ft_strndup(const char *s, size_t n);
 /* heredoc.c */
 void					apply_redirs(t_node *n, t_env **env, t_gc *gc);
 void					prepare_heredocs(t_node *n, t_env **env, t_gc *gc);
-int						read_heredoc(const char *delim, int expand, t_env **env,
-							t_gc *gc);
 void					cleanup_heredocs(t_node *node);
+
+/* heredoc_redir.c */
+void					do_dup(int old, int new, const char *msg);
+void					apply_heredoc(t_node *n);
+void					apply_redir_in(t_node *n);
+void					apply_redir_out(t_node *n);
+void					apply_redir_append(t_node *n);
+
+/* read_heredoc.c */
+int						read_heredoc(const char *delim, int expand,
+							t_env **env, t_gc *gc);
 
 #endif

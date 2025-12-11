@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansions.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/30 20:00:26 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/11 00:59:37 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/11 19:45:18 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,33 +32,17 @@ char	*replace_val_in_env(char *val, t_env **env, t_gc *gc)
 {
 	t_env	*tmp;
 
-	// char	*env_val;
 	tmp = (*env);
 	while (tmp->next)
 	{
 		if (tmp->value && !(ft_strcmp(tmp->key, val)))
 		{
 			return (gc_ft_strdup(tmp->value, gc));
-			// env_val = gc_malloc(sizeof(char) * (ft_strlen(tmp->value) + 1),
-			// gc);
-			// while()
 		}
 		tmp = tmp->next;
 	}
 	return (gc_ft_strdup("\0", gc));
 }
-
-// char	*fill_leading_val(t_segment seg)
-// {
-// 	int		i;
-// 	char	*lead;
-
-// 	i = 0;
-// 	while(seg.str[i] != '$')
-// 	{
-
-// 	}
-// }
 
 int	get_lead_val_size(t_segment seg)
 {
@@ -100,16 +84,6 @@ int	get_expandable_size(t_segment seg)
 	return (size);
 }
 
-// int	get_trail_val_size(t_segment seg)
-// {
-// 	int	i;
-// 	int	size;
-
-// 	i = 0;
-// 	size = 0;
-
-// }
-
 char	*check_for_dollar(t_segment seg, t_env **env, t_gc *gc)
 {
 	int		i;
@@ -130,7 +104,6 @@ char	*check_for_dollar(t_segment seg, t_env **env, t_gc *gc)
 	count = count_dollars(seg);
 	expand_val = gc_malloc(sizeof(char) * (get_expandable_size(seg) + 1), gc);
 	leading_val = gc_malloc(sizeof(char) * (get_lead_val_size(seg) + 1), gc);
-	// leading_val = fill_leading_val(seg);
 	full_all = gc_ft_strdup("\0", gc);
 	while (count)
 	{
@@ -170,5 +143,4 @@ char	*check_for_dollar(t_segment seg, t_env **env, t_gc *gc)
 		count--;
 	}
 	return (full_all);
-	// seg.str = full;
 }

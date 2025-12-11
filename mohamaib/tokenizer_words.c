@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/10 17:04:27 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/11 19:00:16 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ void	handle_expansion_char(t_token *token, char *str, int *i,
 			&& str[*i] != ' ' && str[*i] != '\t'
 			&& str[*i] != '|' && str[*i] != '<' && str[*i] != '>')
 		{
-			// expan[(*w)++] = str[*i];
 			result[(*j)++] = str[(*i)++];
 		}
 		if (*i > start_i)
@@ -66,17 +65,13 @@ char	*remove_quotes_and_track(t_token *token, char *str, int size, t_gc *gc)
 {
 	int		i;
 	int		j;
-	// int		w;
 	char	*result;
-	// char	*expan;
 
 	i = 0;
 	j = 0;
-	// w = 0;
 	token->state = NORMAL;
 	token->expand_line = 0;
 	result = gc_malloc(sizeof(char) * (size + 1), gc);
-	// expan = gc_malloc(sizeof(char) * (size + 1), gc);
 	while (str[i])
 	{
 		if (token->state == NORMAL && (str[i] == '\'' || str[i] == '\"'))
@@ -98,9 +93,6 @@ char	*remove_quotes_and_track(t_token *token, char *str, int size, t_gc *gc)
 		i++;
 	}
 	result[j] = '\0';
-	// expan[w] = '\0';
-	// if (w > 0)
-	// 	token->expand_value = expan;
 	return (result);
 }
 
@@ -139,22 +131,4 @@ void	handle_regular_word(char *str, t_token **head, int *i, t_gc *gc)
 	token->segment = build_segment(token, gc);
 	token->value = remove_quotes_and_track(token, word, size, gc);
 	add_token_to_list(head, token);
-}
-
-void	process_redir_target(t_token *token, char *str, int *i, t_gc *gc)
-{
-	int		size;
-	char	*target;
-
-	token->herdoc_expand = 1;
-	size = word_len(str, (*i));
-	target = extract_word(str, i, size, gc);
-	if ((target[0] == '\'' && target[ft_strlen(target) - 1] == '\'') ||
-		(target[0] == '"' && target[ft_strlen(target) - 1] == '"'))
-		token->herdoc_expand = 0;
-	target = remove_quotes_and_track(token, target, size, gc);
-	if (token->type == T_HEREDOC)
-		token->heredoc_del = target;
-	else
-		token->filename = target;
 }

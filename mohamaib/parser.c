@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/11 01:43:40 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/11 20:04:27 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ t_node	*create_cmd_node(char **cmd, t_gc *gc)
 	node->left = NULL;
 	node->builtin = BLT_NONE;
 	node->heredoc_fd = -1;
+	node->heredoc_expand = 0;
+	node->file_fd = -1;
 	return (node);
 }
 
@@ -37,9 +39,9 @@ t_node	*create_redir_node(t_token_type type, t_token *red_tok, t_node *left,
 	node->type = REDIR_NODE;
 	node->cmd = NULL;
 	node->heredoc_expand = red_tok->herdoc_expand;
-	if(red_tok->heredoc_del)
+	if (red_tok->heredoc_del)
 		node->filename = gc_ft_strdup(red_tok->heredoc_del, gc);
-	else if(red_tok->filename)
+	else if (red_tok->filename)
 		node->filename = gc_ft_strdup(red_tok->filename, gc);
 	else
 		node->filename = NULL;
@@ -48,6 +50,7 @@ t_node	*create_redir_node(t_token_type type, t_token *red_tok, t_node *left,
 	node->right = NULL;
 	node->builtin = BLT_NONE;
 	node->heredoc_fd = -1;
+	node->file_fd = -1;
 	return (node);
 }
 
@@ -65,6 +68,7 @@ t_node	*create_pipe_node(t_node *left, t_node *right, t_gc *gc)
 	node->builtin = BLT_NONE;
 	node->heredoc_fd = -1;
 	node->file_fd = -1;
+	node->heredoc_expand = 0;
 	return (node);
 }
 
@@ -82,36 +86,4 @@ int	count_cmd_words(t_token *head)
 		tmp = tmp->next;
 	}
 	return (count);
-}
-
-char	**build_cmd_array(t_token **head, t_env **env, t_gc *gc)
-{
-	int		i;
-	int		j;
-	char	**cmd;
-	t_token	*tmp;
-
-	i = 0;
-	tmp = (*head);
-	cmd = gc_malloc((sizeof(char *) * (count_cmd_words(*head) + 1)), gc);
-	while (tmp && tmp->type != T_PIPE)
-	{
-		j = 0;
-		cmd[i] = gc_ft_strdup("\0", gc);
-		if (tmp->type == T_WORD)
-		{
-			while (tmp->segment[j].str)
-			{
-				if (tmp->segment[j].expands == 1)
-					tmp->segment[j].str = gc_ft_strdup(check_for_dollar(tmp->segment[j],
-								env, gc), gc);
-				cmd[i] = gc_ft_strjoin(cmd[i], tmp->segment[j].str, gc);
-				j++;
-			}
-			i++;
-		}
-		tmp = tmp->next;
-	}
-	cmd[i] = NULL;
-	return (cmd);
 }

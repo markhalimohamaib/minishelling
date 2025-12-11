@@ -3,52 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   segment_build.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/30 22:16:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/02 16:53:35 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/11 19:11:53 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-static int	count_segments(const char *org)
-{
-	int	i;
-	int	count;
-
-	i = 0;
-	count = 0;
-	while (org[i])
-	{
-		if (org[i] == '\'')
-		{
-			count++;
-			i++;
-			while (org[i] && org[i] != '\'')
-				i++;
-			if (org[i] == '\'')
-				i++;
-		}
-		else if (org[i] == '"')
-		{
-			count++;
-			i++;
-			while (org[i] && org[i] != '"')
-				i++;
-			if (org[i] == '"')
-				i++;
-		}
-		else
-		{
-			count++;
-			while (org[i] && org[i] != '\'' && org[i] != '"' && org[i] != '|'
-				&& org[i] != '>' && org[i] != '<')
-				i++;
-		}
-	}
-	return (count);
-}
 
 char	*read_single_quoted(char *origin, int *i, t_gc *gc)
 {
@@ -134,6 +96,14 @@ char	*read_unquoted(char *origin, int *i, t_gc *gc)
 	return (str);
 }
 
+static void	set_segment(t_segment *seg, char *str, t_token_state state,
+		int expands)
+{
+	seg->str = str;
+	seg->seg_state = state;
+	seg->expands = expands;
+}
+
 t_segment	*build_segment(t_token *token, t_gc *gc)
 {
 	int			i;
@@ -149,27 +119,15 @@ t_segment	*build_segment(t_token *token, t_gc *gc)
 	while (org[i])
 	{
 		if (org[i] == '\'')
-		{
-			seg[j].str = read_single_quoted(org, &i, gc);
-			seg[j].seg_state = IN_SINGLE;
-			seg[j].expands = 0;
-		}
-		else if (org[i] == '\"')
-		{
-			seg[j].str = read_double_quoted(org, &i, gc);
-			seg[j].seg_state = IN_DOUBLE;
-			seg[j].expands = 1;
-		}
+			set_segment(&seg[j], read_single_quoted(org, &i, gc), IN_SINGLE, 0);
+		else if (org[i] == '"')
+			set_segment(&seg[j], read_double_quoted(org, &i, gc), IN_DOUBLE, 1);
 		else
-		{
-			seg[j].str = read_unquoted(org, &i, gc);
-			seg[j].seg_state = NORMAL;
-			seg[j].expands = 1;
-		}
+			set_segment(&seg[j], read_unquoted(org, &i, gc), NORMAL, 1);
 		j++;
 	}
 	seg[j].str = NULL;
-	seg[j].expands = NORMAL;
+	seg[j].seg_state = NORMAL;
 	seg[j].expands = 0;
 	return (seg);
 }

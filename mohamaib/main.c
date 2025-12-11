@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/11 00:49:57 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/11 17:28:48 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,30 +41,47 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 	cleanup_heredocs(ast);
 }
 
+static int	init_minishell(t_gc *gc, t_env **env, char **envp)
+{
+	gc_init(gc);
+	*env = init_env(envp);
+	if (!(*env))
+	{
+		ft_putstr_fd("minishell: failed to initialize environment\n", 2);
+		return (1);
+	}
+	return (0);
+}
+
+static int	handle_input(char *line, t_gc *gc, t_env **env)
+{
+	if (should_exit(line))
+	{
+		free(line);
+		return (1);
+	}
+	process_line(line, gc, env);
+	free(line);
+	gc_free_all(gc);
+	gc_init(gc);
+	return (0);
+}
+
 int	main(int argc, char **argv, char **envp)
 {
-	char	*line;
 	t_gc	gc;
 	t_env	*env;
+	char	*line;
 
 	(void)argc;
 	(void)argv;
-	gc_init(&gc);
-	env = init_env(envp);
-	if (!env)
-		return (ft_putstr_fd("minishell: failed to initialize environment\n", 2), 1);
+	if (init_minishell(&gc, &env, envp))
+		return (1);
 	while (1)
 	{
 		line = readline("minishell$ ");
-		if (should_exit(line))
-		{
-			free(line);
+		if (!line || handle_input(line, &gc, &env))
 			break ;
-		}
-		process_line(line, &gc, &env);
-		free(line);
-		gc_free_all(&gc);
-		gc_init(&gc);
 	}
 	gc_free_all(&gc);
 	free_env(env);
