@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/11 19:29:26 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/12 23:05:45 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,6 +124,18 @@ typedef struct s_node
 	int					heredoc_fd;
 }						t_node;
 
+typedef struct s_val_full_init
+{
+	int					i;
+	int					j;
+	int					z;
+	char				*expand_val;
+	char				*leading_val;
+	char				*trailing_val;
+	char				*full;
+	char				*full_all;
+}						t_val_full_init;
+
 /* gc.c */
 void					gc_init(t_gc *gc);
 void					*gc_malloc(size_t size, t_gc *gc);
@@ -188,9 +200,9 @@ int						should_exit(char *line);
 void					process_line(char *line, t_gc *gc, t_env **env);
 
 /* builtin_utils.c */
+int						ft_strcmp(const char *s1, const char *s2);
 t_builtin_type			get_builtin_type(char *cmd);
 void					mark_builtins(t_node *node);
-int						ft_strcmp(const char *s1, const char *s2);
 
 /* exec.c */
 int						execute_node(t_node *node, t_env **env, t_gc *gc);
@@ -215,7 +227,9 @@ char					**env_to_array(t_env *env, t_gc *gc);
 char					*get_path(char **env, t_gc *gc);
 
 /* exec_utils2.c */
+void					close_fds(int *fd);
 int						execute_pipe(t_node *node, t_env **env, t_gc *gc);
+int						execute_redir(t_node *node, t_env **env, t_gc *gc);
 
 /* exec_utils3.c */
 int						handle_redir_in(t_node *node, t_env **env, t_gc *gc);
@@ -233,19 +247,16 @@ int						count_segments(const char *org);
 
 /* expansions.c */
 char					*check_for_dollar(t_segment seg, t_env **env, t_gc *gc);
+int						check_char(t_segment seg, int i);
+void					initialize(t_val_full_init *val_init, t_segment *seg);
+void					initialize2(t_val_full_init *val_init, t_segment *seg,
+							t_gc *gc, t_env **env);
 
 /* expansions_helper.c */
-char					*expand_one(char *s, int *i, t_env **env, t_gc *gc);
-char					*build_expanded(char *s, int *i, t_env **env, t_gc *gc);
-char					*expand_all_dollars(t_segment seg, t_env **env,
-							t_gc *gc);
-
-/* expansion_helper2.c */
-int						is_expandable_char(char c);
-int						get_expandable_size_str(char *s, int i);
-char					*gc_ft_strndup(char *s, int n, t_gc *gc);
 int						count_dollars(t_segment seg);
-char					*replace_val_in_env(char *key, t_env **env, t_gc *gc);
+char					*replace_val_in_env(char *val, t_env **env, t_gc *gc);
+int						get_lead_val_size(t_segment seg);
+int						get_expandable_size(t_segment seg);
 
 /* ./builtins */
 t_env					*init_env(char **envp);

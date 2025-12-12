@@ -5,62 +5,81 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/12/11 17:45:15 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/11 18:25:02 by markhali         ###   ########.fr       */
+/*   Created: 2025/12/12 23:04:03 by markhali          #+#    #+#             */
+/*   Updated: 2025/12/12 23:04:39 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*expand_one(char *s, int *i, t_env **env, t_gc *gc)
+int	count_dollars(t_segment seg)
 {
-	char	*key;
-	char	*val;
-	int		j;
-
-	j = 0;
-	key = gc_malloc(sizeof(char) * (get_expandable_size_str(s, *i) + 1), gc);
-	*i = *i + 1;
-	while (s[*i] && is_expandable_char(s[*i]))
-		key[j++] = s[(*i)++];
-	key[j] = '\0';
-	val = replace_val_in_env(key, env, gc);
-	return (val);
-}
-
-char	*build_expanded(char *s, int *i, t_env **env, t_gc *gc)
-{
-	char	*leading;
-	char	*mid;
-	char	*trailing;
-	int		start;
-
-	start = *i;
-	while (s[*i] && s[*i] != '$')
-		(*i)++;
-	leading = gc_ft_strndup(s + start, *i - start, gc);
-	mid = expand_one(s, i, env, gc);
-	start = *i;
-	while (s[*i] && s[*i] != '$')
-		(*i)++;
-	trailing = gc_ft_strndup(s + start, *i - start, gc);
-	return (ft_strjoin_plus(leading, mid, trailing, gc));
-}
-
-char	*expand_all_dollars(t_segment seg, t_env **env, t_gc *gc)
-{
-	char	*final;
-	char	*tmp;
-	int		i;
-	int		count;
+	int	i;
+	int	doll_count;
 
 	i = 0;
-	final = gc_ft_strdup("", gc);
-	count = count_dollars(seg);
-	while (count--)
+	doll_count = 0;
+	while (seg.str[i])
 	{
-		tmp = build_expanded(seg.str, &i, env, gc);
-		final = gc_ft_strjoin(final, tmp, gc);
+		if (seg.str[i] == '$')
+			doll_count++;
+		i++;
 	}
-	return (final);
+	return (doll_count);
+}
+
+char	*replace_val_in_env(char *val, t_env **env, t_gc *gc)
+{
+	t_env	*tmp;
+
+	tmp = (*env);
+	while (tmp->next)
+	{
+		if (tmp->value && !(ft_strcmp(tmp->key, val)))
+		{
+			return (gc_ft_strdup(tmp->value, gc));
+		}
+		tmp = tmp->next;
+	}
+	return (gc_ft_strdup("\0", gc));
+}
+
+int	get_lead_val_size(t_segment seg)
+{
+	int	size;
+	int	i;
+
+	i = 0;
+	size = 0;
+	while (seg.str[i] != '$')
+	{
+		i++;
+		size++;
+	}
+	return (size);
+}
+
+int	get_expandable_size(t_segment seg)
+{
+	int	size;
+	int	i;
+
+	i = 0;
+	size = 0;
+	while (seg.str[i])
+	{
+		if (seg.str[i] == '$')
+		{
+			i++;
+			while (seg.str[i] && seg.str[i] != ' ' && seg.str[i] != '|'
+				&& seg.str[i] != '>' && seg.str[i] != '<')
+			{
+				size++;
+				i++;
+			}
+			break ;
+		}
+		i++;
+	}
+	return (size);
 }

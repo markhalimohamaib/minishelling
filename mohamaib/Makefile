@@ -6,7 +6,7 @@
 #    By: markhali <markhali@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#              #
-#    Updated: 2025/12/11 19:47:17 by markhali         ###   ########.fr        #
+#    Updated: 2025/12/12 23:05:58 by markhali         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -36,6 +36,7 @@ SRCS		= main.c \
 			  segment_build.c \
 			  segment_count.c \
 			  expansions.c \
+			  expansions_helper.c \
 			  heredoc.c \
 			  read_heredoc.c \
 			  heredoc_redir.c

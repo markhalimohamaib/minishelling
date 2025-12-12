@@ -6,141 +6,86 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/30 20:00:26 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/11 19:45:18 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/12 23:04:36 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	count_dollars(t_segment seg)
-{
-	int	i;
-	int	doll_count;
-
-	i = 0;
-	doll_count = 0;
-	while (seg.str[i])
-	{
-		if (seg.str[i] == '$')
-			doll_count++;
-		i++;
-	}
-	return (doll_count);
-}
-
-char	*replace_val_in_env(char *val, t_env **env, t_gc *gc)
-{
-	t_env	*tmp;
-
-	tmp = (*env);
-	while (tmp->next)
-	{
-		if (tmp->value && !(ft_strcmp(tmp->key, val)))
-		{
-			return (gc_ft_strdup(tmp->value, gc));
-		}
-		tmp = tmp->next;
-	}
-	return (gc_ft_strdup("\0", gc));
-}
-
-int	get_lead_val_size(t_segment seg)
-{
-	int	size;
-	int	i;
-
-	i = 0;
-	size = 0;
-	while (seg.str[i] != '$')
-	{
-		i++;
-		size++;
-	}
-	return (size);
-}
-
-int	get_expandable_size(t_segment seg)
-{
-	int	size;
-	int	i;
-
-	i = 0;
-	size = 0;
-	while (seg.str[i])
-	{
-		if (seg.str[i] == '$')
-		{
-			i++;
-			while (seg.str[i] && seg.str[i] != ' ' && seg.str[i] != '|'
-				&& seg.str[i] != '>' && seg.str[i] != '<')
-			{
-				size++;
-				i++;
-			}
-			break ;
-		}
-		i++;
-	}
-	return (size);
-}
-
 char	*check_for_dollar(t_segment seg, t_env **env, t_gc *gc)
 {
-	int		i;
-	int		j;
-	int		z;
-	int		count;
-	char	*expand_val;
-	char	*leading_val;
-	char	*trailing_val;
-	char	*full;
-	char	*full_all;
+	int				count;
+	t_val_full_init	val_init;
 
-	i = 0;
-	j = 0;
-	z = 0;
+	val_init.i = 0;
+	val_init.j = 0;
+	val_init.z = 0;
 	if (!(ft_strchr(seg.str, '$')))
 		return (seg.str);
 	count = count_dollars(seg);
-	expand_val = gc_malloc(sizeof(char) * (get_expandable_size(seg) + 1), gc);
-	leading_val = gc_malloc(sizeof(char) * (get_lead_val_size(seg) + 1), gc);
-	full_all = gc_ft_strdup("\0", gc);
+	val_init.expand_val = gc_malloc(sizeof(char)
+			* (get_expandable_size(seg) + 1), gc);
+	val_init.leading_val = gc_malloc(sizeof(char)
+			* (get_lead_val_size(seg) + 1), gc);
+	val_init.full_all = gc_ft_strdup("\0", gc);
 	while (count)
 	{
-		leading_val[0] = '\0';
-		expand_val[0] = '\0';
-		trailing_val = gc_ft_strdup("\0", gc);
-		full = gc_ft_strdup("\0", gc);
-		while (seg.str[i] != '$')
-			leading_val[j++] = seg.str[i++];
-		leading_val[j] = '\0';
-		j = 0;
-		if (seg.str[i] == '$')
-			i++;
-		while (seg.str[i] && seg.str[i] != '\'' && seg.str[i] != ' '
-			&& seg.str[i] != '\"' && seg.str[i] != '/' && seg.str[i] != '@'
-			&& seg.str[i] != ',' && seg.str[i] != '.' && seg.str[i] != '?'
-			&& seg.str[i] != '%' && seg.str[i] != '^' && seg.str[i] != '&'
-			&& seg.str[i] != '*' && seg.str[i] != ')' && seg.str[i] != '('
-			&& seg.str[i] != '{' && seg.str[i] != '}' && seg.str[i] != '-'
-			&& seg.str[i] != '+' && seg.str[i] != '=' && seg.str[i] != ':'
-			&& seg.str[i] != ';' && seg.str[i] != '\\' && seg.str[i] != '~'
-			&& seg.str[i] != '|' && seg.str[i] != '<' && seg.str[i] != '>'
-			&& seg.str[i] != '$' && seg.str[i] != '#')
-			expand_val[j++] = seg.str[i++];
-		expand_val[j] = '\0';
-		z = i;
-		while (seg.str[z] && seg.str[z] != '$')
-			z++;
-		j = 0;
-		trailing_val = gc_malloc(sizeof(char) * (z), gc);
-		while (seg.str[i] && seg.str[z] != '$')
-			trailing_val[j++] = seg.str[i++];
-		trailing_val[j] = '\0';
-		full = ft_strjoin_plus(leading_val, replace_val_in_env(expand_val, env,
-					gc), trailing_val, gc);
-		full_all = gc_ft_strjoin(full_all, full, gc);
+		initialize(&val_init, &seg);
+		initialize2(&val_init, &seg, gc, env);
 		count--;
 	}
-	return (full_all);
+	return (val_init.full_all);
+}
+
+int	check_char(t_segment seg, int i)
+{
+	if (seg.str[i] && seg.str[i] != '\'' && seg.str[i] != ' '
+		&& seg.str[i] != '\"' && seg.str[i] != '/' && seg.str[i] != '@'
+		&& seg.str[i] != ',' && seg.str[i] != '.' && seg.str[i] != '?'
+		&& seg.str[i] != '%' && seg.str[i] != '^' && seg.str[i] != '&'
+		&& seg.str[i] != '*' && seg.str[i] != ')' && seg.str[i] != '('
+		&& seg.str[i] != '{' && seg.str[i] != '}' && seg.str[i] != '-'
+		&& seg.str[i] != '+' && seg.str[i] != '=' && seg.str[i] != ':'
+		&& seg.str[i] != ';' && seg.str[i] != '\\' && seg.str[i] != '~'
+		&& seg.str[i] != '|' && seg.str[i] != '<' && seg.str[i] != '>'
+		&& seg.str[i] != '$' && seg.str[i] != '#')
+	{
+		return (1);
+	}
+	return (0);
+}
+
+void	initialize(t_val_full_init *val_init, t_segment *seg)
+{
+	val_init->leading_val[0] = '\0';
+	val_init->expand_val[0] = '\0';
+	while (seg->str[val_init->i] != '$')
+		val_init->leading_val[val_init->j++] = seg->str[val_init->i++];
+	val_init->leading_val[val_init->j] = '\0';
+	val_init->j = 0;
+	if (seg->str[val_init->i] == '$')
+		val_init->i++;
+	while (check_char(*seg, val_init->i))
+		val_init->expand_val[val_init->j++] = seg->str[val_init->i++];
+	val_init->expand_val[val_init->j] = '\0';
+	val_init->z = val_init->i;
+	while (seg->str[val_init->z] && seg->str[val_init->z] != '$')
+		val_init->z++;
+	val_init->j = 0;
+}
+
+void	initialize2(t_val_full_init *val_init, t_segment *seg,
+			t_gc *gc, t_env **env)
+{
+	val_init->trailing_val = gc_ft_strdup("\0", gc);
+	val_init->full = gc_ft_strdup("\0", gc);
+	val_init->trailing_val = gc_malloc(sizeof(char) * (val_init->z), gc);
+	while (seg->str[val_init->i] && seg->str[val_init->z] != '$')
+		val_init->trailing_val[val_init->j++] = seg->str[val_init->i++];
+	val_init->trailing_val[val_init->j] = '\0';
+	val_init->full = ft_strjoin_plus(val_init->leading_val,
+			replace_val_in_env(val_init->expand_val, env,
+				gc), val_init->trailing_val, gc);
+	val_init->full_all = gc_ft_strjoin(val_init->full_all,
+			val_init->full, gc);
 }
