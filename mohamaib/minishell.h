@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/12 23:05:45 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/16 19:26:11 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,10 @@
 # include <sys/wait.h>
 # include <termios.h>
 # include <unistd.h>
+# include <signal.h>
+#include <sys/ioctl.h>
+
+extern volatile sig_atomic_t g_signal;
 
 typedef struct s_env
 {
@@ -279,7 +283,7 @@ char					*ft_strndup(const char *s, size_t n);
 
 /* heredoc.c */
 void					apply_redirs(t_node *n, t_env **env, t_gc *gc);
-void					prepare_heredocs(t_node *n, t_env **env, t_gc *gc);
+int						prepare_heredocs(t_node *n, t_env **env, t_gc *gc);
 void					cleanup_heredocs(t_node *node);
 
 /* heredoc_redir.c */
@@ -292,5 +296,16 @@ void					apply_redir_append(t_node *n);
 /* read_heredoc.c */
 int						read_heredoc(const char *delim, int expand,
 							t_env **env, t_gc *gc);
+
+/* signals.c */
+void					handle_sigint_interactive(int sig);
+void					handle_sigint_heredoc(int sig);
+void					setup_signals_interactive(void);
+void					setup_signals_exec(void);
+void					setup_signals_heredoc(void);
+void					setup_signals_child(void);
+int						get_signal_exit_status(void);
+void					reset_signal(void);
+int	get_exit_code_from_status(int status);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/16 18:43:44 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/11 19:37:32 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/16 18:49:47 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,11 +92,12 @@ void	execute(t_node *node, t_env **env, t_gc *gc)
 	path = get_path(envp, gc);
 	dirs = gc_ft_split(path, ':', gc);
 	cmd = gc_ft_strdup(node->cmd[0], gc);
+	setup_signals_child();
 	if (ft_strchr(cmd, '/'))
 	{
 		execve(cmd, node->cmd, envp);
 		perror(cmd);
-		exit(0);
+		exit(127);
 	}
 	while (dirs[i])
 	{
@@ -104,7 +105,7 @@ void	execute(t_node *node, t_env **env, t_gc *gc)
 		if (access(cmd, X_OK) == 0)
 		{
 			execve(cmd, node->cmd, envp);
-			exit(0);
+			exit(127);
 		}
 		i++;
 	}
@@ -112,11 +113,33 @@ void	execute(t_node *node, t_env **env, t_gc *gc)
 	exit(127);
 }
 
+int	get_exit_code_from_status(int status)
+{
+	if (WIFEXITED(status))
+		return (WEXITSTATUS(status));
+	else if (WIFSIGNALED(status))
+	{
+		/* Handle signals: ctrl-C returns 130, ctrl-\ returns 131 */
+		if (WTERMSIG(status) == SIGINT)
+			return (130);
+		else if (WTERMSIG(status) == SIGQUIT)
+		{
+			write(2, "Quit (core dumped)\n", 19);
+			return (131);
+		}
+	}
+	return (1);
+}
+
 int	exec_cmd(t_node *node, t_env **env, t_gc *gc)
 {
+	int	status;
+	int	exit_code;
+
 	node->pid1 = fork();
 	if (node->pid1 == 0)
 		execute(node, env, gc);
-	waitpid(node->pid1, NULL, 0);
-	return (1);
+	waitpid(node->pid1, &status, 0);
+	exit_code = get_exit_code_from_status(status);
+	return (exit_code);
 }

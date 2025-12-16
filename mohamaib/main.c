@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/11 17:28:48 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/16 19:55:42 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 {
 	t_token	*tokens;
 	t_node	*ast;
+	int		exit_status;
+	int		heredoc_status;
 
 	if (!line || line[0] == '\0')
 		return ;
@@ -33,11 +35,29 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 	tokens = tokenize_input(line, gc);
 	print_token_list(tokens);
 	ast = parse_pipeline(&tokens, env, gc);
-	prepare_heredocs(ast, env, gc);
+	reset_signal();
+	setup_signals_heredoc();
+	heredoc_status = prepare_heredocs(ast, env, gc);
+	setup_signals_interactive();
+	if (heredoc_status == -1)
+	{
+		cleanup_heredocs(ast);
+		reset_signal();
+		return ;
+	}
 	mark_builtins(ast);
 	print_ast(ast);
 	if (ast)
-		execute_node(ast, env, gc);
+	{
+		setup_signals_exec();
+		exit_status = execute_node(ast, env, gc);
+		setup_signals_interactive();
+		if (g_signal)
+		{
+			exit_status = get_signal_exit_status();
+			reset_signal();
+		}
+	}
 	cleanup_heredocs(ast);
 }
 
@@ -50,6 +70,7 @@ static int	init_minishell(t_gc *gc, t_env **env, char **envp)
 		ft_putstr_fd("minishell: failed to initialize environment\n", 2);
 		return (1);
 	}
+	setup_signals_interactive();
 	return (0);
 }
 
@@ -80,10 +101,16 @@ int	main(int argc, char **argv, char **envp)
 	while (1)
 	{
 		line = readline("minishell$ ");
-		if (!line || handle_input(line, &gc, &env))
+		if (!line)
+		{
+			printf("exit\n");
+			break ;
+		}
+		if (handle_input(line, &gc, &env))
 			break ;
 	}
 	gc_free_all(&gc);
 	free_env(env);
+	rl_clear_history();
 	return (0);
 }

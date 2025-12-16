@@ -6,22 +6,27 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/10 10:51:13 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/11 17:39:20 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/16 19:38:53 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	prepare_heredocs(t_node *n, t_env **env, t_gc *gc)
+int	prepare_heredocs(t_node *n, t_env **env, t_gc *gc)
 {
 	if (!n)
-		return ;
+		return (0);
 	if (n->type == REDIR_NODE && n->redir_type == T_HEREDOC)
 	{
 		n->heredoc_fd = read_heredoc(n->filename, n->heredoc_expand, env, gc);
+		if (n->heredoc_fd == -1)
+			return (-1);
 	}
-	prepare_heredocs(n->left, env, gc);
-	prepare_heredocs(n->right, env, gc);
+	if (prepare_heredocs(n->left, env, gc) == -1)
+		return (-1);
+	if (prepare_heredocs(n->right, env, gc) == -1)
+		return (-1);
+	return (0);
 }
 
 void	apply_redirs(t_node *n, t_env **env, t_gc *gc)
