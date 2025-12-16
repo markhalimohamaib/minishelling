@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/16 18:43:44 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/16 18:49:47 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/16 20:09:46 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,6 +136,7 @@ int	exec_cmd(t_node *node, t_env **env, t_gc *gc)
 	int	status;
 	int	exit_code;
 
+	status = 0;
 	node->pid1 = fork();
 	if (node->pid1 == 0)
 		execute(node, env, gc);
