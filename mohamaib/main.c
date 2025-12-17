@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/16 19:55:42 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/17 18:21:05 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,13 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 	t_node	*ast;
 	int		exit_status;
 	int		heredoc_status;
+	char	exit_str[12];
 
 	if (!line || line[0] == '\0')
 		return ;
 	add_history(line);
 	tokens = tokenize_input(line, gc);
-	print_token_list(tokens);
+	// print_token_list(tokens);
 	ast = parse_pipeline(&tokens, env, gc);
 	reset_signal();
 	setup_signals_heredoc();
@@ -42,11 +43,12 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 	if (heredoc_status == -1)
 	{
 		cleanup_heredocs(ast);
+		set_exit_status(env, 130, exit_str);
 		reset_signal();
 		return ;
 	}
 	mark_builtins(ast);
-	print_ast(ast);
+	// print_ast(ast);
 	if (ast)
 	{
 		setup_signals_exec();
@@ -57,6 +59,7 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 			exit_status = get_signal_exit_status();
 			reset_signal();
 		}
+		set_exit_status(env, exit_status, exit_str);
 	}
 	cleanup_heredocs(ast);
 }
@@ -70,17 +73,13 @@ static int	init_minishell(t_gc *gc, t_env **env, char **envp)
 		ft_putstr_fd("minishell: failed to initialize environment\n", 2);
 		return (1);
 	}
+	init_shlvl(env);
 	setup_signals_interactive();
 	return (0);
 }
 
 static int	handle_input(char *line, t_gc *gc, t_env **env)
 {
-	if (should_exit(line))
-	{
-		free(line);
-		return (1);
-	}
 	process_line(line, gc, env);
 	free(line);
 	gc_free_all(gc);
@@ -93,11 +92,13 @@ int	main(int argc, char **argv, char **envp)
 	t_gc	gc;
 	t_env	*env;
 	char	*line;
+	char	exit_str[12];
 
 	(void)argc;
 	(void)argv;
 	if (init_minishell(&gc, &env, envp))
 		return (1);
+	set_exit_status(&env, 0, exit_str);
 	while (1)
 	{
 		line = readline("minishell$ ");

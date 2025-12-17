@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/16 19:26:11 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/17 19:11:45 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@
 # include <unistd.h>
 # include <signal.h>
 #include <sys/ioctl.h>
+#include <sys/stat.h>
+
 
 extern volatile sig_atomic_t g_signal;
 
@@ -229,6 +231,7 @@ char					*env_join_kv(char *key, char *value, t_gc *gc);
 int						env_fill_array(char **arr, t_env *env, t_gc *gc);
 char					**env_to_array(t_env *env, t_gc *gc);
 char					*get_path(char **env, t_gc *gc);
+int						check_command_type(char *cmd);
 
 /* exec_utils2.c */
 void					close_fds(int *fd);
@@ -276,7 +279,7 @@ int						builtin_cd(char **argv, t_env **env);
 int						builtin_env(t_env *env);
 int						builtin_export(t_env **env, char **args);
 int						builtin_unset(t_env **env, char **args);
-int						builtin_exit(char **argv);
+int						builtin_exit(char **argv, t_env **env);
 
 int						is_valid_identifier(const char *str);
 char					*ft_strndup(const char *s, size_t n);
@@ -306,6 +309,13 @@ void					setup_signals_heredoc(void);
 void					setup_signals_child(void);
 int						get_signal_exit_status(void);
 void					reset_signal(void);
-int	get_exit_code_from_status(int status);
+
+/* exit_status.c */
+int						get_exit_code_from_status(int status);
+char					*get_exit_status(t_env *env);
+void					set_exit_status(t_env **env, int status, char *buffer);
+
+/* shlvl.c */
+void					init_shlvl(t_env **env);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 19:04:08 by markhali          #+#    #+#             */
-/*   Updated: 2025/11/12 10:34:32 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/17 17:38:08 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,19 +30,24 @@ static int	is_numeric(const char *str)
 	return (1);
 }
 
-int	builtin_exit(char **argv)
+int	builtin_exit(char **argv, t_env **env)
 {
 	int	exit_code;
+	char	exit_str[12];
 
 	printf("exit\n");
 	if (!argv[1])
+	{
+		set_exit_status(env, 0, exit_str);
 		exit(0);
+	}
 	if (!is_numeric(argv[1]))
 	{
 		ft_putstr_fd("minishell: exit: ", 2);
 		ft_putstr_fd(argv[1], 2);
 		ft_putstr_fd(": numeric argument required\n", 2);
-		exit(255);
+		set_exit_status(env, 2, exit_str);
+		exit(2);
 	}
 	if (argv[2])
 	{
@@ -50,5 +55,6 @@ int	builtin_exit(char **argv)
 		return (1);
 	}
 	exit_code = ft_atoi(argv[1]);
+	set_exit_status(env, exit_code % 256, exit_str);
 	exit(exit_code % 256);
 }

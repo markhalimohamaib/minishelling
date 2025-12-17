@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 10:29:31 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/16 18:44:21 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/16 20:37:20 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ static int	execute_builtin(t_node *node, t_env **env)
 	else if (node->builtin == BLT_UNSET)
 		return (builtin_unset(env, node->cmd));
 	else if (node->builtin == BLT_EXIT)
-		return (builtin_exit(node->cmd));
+		return (builtin_exit(node->cmd, env));
 	return (0);
 }
 

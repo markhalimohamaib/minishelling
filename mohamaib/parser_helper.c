@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/11 17:22:57 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/11 17:23:28 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/17 19:05:27 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,10 @@ static void	fill_cmd_words(char **cmd, t_token **head, t_env **env, t_gc *gc)
 	{
 		if (tmp->type == T_WORD)
 		{
-			cmd[i] = gc_ft_strdup("\0", gc);
+			cmd[i] = gc_ft_strdup("", gc);
 			append_segments(tmp, &cmd[i], env, gc);
-			i++;
+			if (cmd[i][0] != '\0')
+				i++;
 		}
 		tmp = tmp->next;
 	}

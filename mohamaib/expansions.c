@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/30 20:00:26 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/12 23:04:36 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/17 19:09:01 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,26 @@ void	initialize(t_val_full_init *val_init, t_segment *seg)
 	val_init->j = 0;
 	if (seg->str[val_init->i] == '$')
 		val_init->i++;
-	while (check_char(*seg, val_init->i))
-		val_init->expand_val[val_init->j++] = seg->str[val_init->i++];
+	if (seg->str[val_init->i] == '?')
+	{
+		val_init->expand_val[val_init->j++] = '?';
+		val_init->i++;
+	}
+	else if (!seg->str[val_init->i] || seg->str[val_init->i] == ' ' 
+		|| seg->str[val_init->i] == '\t' || seg->str[val_init->i] == '$'
+		|| seg->str[val_init->i] == '\"' || seg->str[val_init->i] == '\''
+		|| seg->str[val_init->i] == '|' || seg->str[val_init->i] == '<'
+		|| seg->str[val_init->i] == '>')
+	{
+		val_init->leading_val[ft_strlen(val_init->leading_val)] = '$';
+		val_init->leading_val[ft_strlen(val_init->leading_val) + 1] = '\0';
+		val_init->expand_val[0] = '\0';
+	}
+	else
+	{
+		while (check_char(*seg, val_init->i))
+			val_init->expand_val[val_init->j++] = seg->str[val_init->i++];
+	}
 	val_init->expand_val[val_init->j] = '\0';
 	val_init->z = val_init->i;
 	while (seg->str[val_init->z] && seg->str[val_init->z] != '$')

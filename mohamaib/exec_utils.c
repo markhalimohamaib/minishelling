@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/16 18:43:44 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/16 20:09:46 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/17 17:49:00 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,26 @@ char	*get_path(char **env, t_gc *gc)
 	return (path);
 }
 
+int	check_command_type(char *cmd)
+{
+	struct stat	st;
+
+	if (access(cmd, F_OK) != 0)
+		return (127);
+	if (stat(cmd, &st) == 0 && S_ISDIR(st.st_mode))
+	{
+		ft_putstr_fd(cmd, 2);
+		ft_putstr_fd(": Is a directory\n", 2);
+		return (126);
+	}
+	if (access(cmd, X_OK) != 0)
+	{
+		perror(cmd);
+		return (126);
+	}
+	return (0);
+}
+
 void	execute(t_node *node, t_env **env, t_gc *gc)
 {
 	int		i;
@@ -86,6 +106,7 @@ void	execute(t_node *node, t_env **env, t_gc *gc)
 	char	**envp;
 	char	*path;
 	char	**dirs;
+	int		check_result;
 
 	i = 0;
 	envp = env_to_array((*env), gc);
@@ -95,6 +116,9 @@ void	execute(t_node *node, t_env **env, t_gc *gc)
 	setup_signals_child();
 	if (ft_strchr(cmd, '/'))
 	{
+		check_result = check_command_type(cmd);
+		if (check_result != 0)
+			exit(check_result);
 		execve(cmd, node->cmd, envp);
 		perror(cmd);
 		exit(127);
@@ -102,33 +126,19 @@ void	execute(t_node *node, t_env **env, t_gc *gc)
 	while (dirs[i])
 	{
 		cmd = ft_strjoin_plus(dirs[i], "/", node->cmd[0], gc);
-		if (access(cmd, X_OK) == 0)
+		check_result = check_command_type(cmd);
+		if (check_result == 0)
 		{
 			execve(cmd, node->cmd, envp);
 			exit(127);
 		}
+		else if (check_result == 126)
+			exit(126);
 		i++;
 	}
-	printf("%s: command not found\n", node->cmd[0]);
+	ft_putstr_fd(node->cmd[0], 2);
+	ft_putstr_fd(": command not found\n", 2);
 	exit(127);
-}
-
-int	get_exit_code_from_status(int status)
-{
-	if (WIFEXITED(status))
-		return (WEXITSTATUS(status));
-	else if (WIFSIGNALED(status))
-	{
-		/* Handle signals: ctrl-C returns 130, ctrl-\ returns 131 */
-		if (WTERMSIG(status) == SIGINT)
-			return (130);
-		else if (WTERMSIG(status) == SIGQUIT)
-		{
-			write(2, "Quit (core dumped)\n", 19);
-			return (131);
-		}
-	}
-	return (1);
 }
 
 int	exec_cmd(t_node *node, t_env **env, t_gc *gc)

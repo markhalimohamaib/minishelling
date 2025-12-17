@@ -6,20 +6,22 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 14:04:23 by markhali          #+#    #+#             */
-/*   Updated: 2025/11/12 10:33:17 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/17 18:07:44 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-static char	*get_target(char **argv, t_env *env)
+static char	*get_target(char **argv)
 {
 	char	*target;
 
 	if (!argv[1] || !argv[1][0])
-		target = get_env(env, "HOME");
+		target = getenv("HOME");
+	else if (ft_strcmp(argv[1], "~") == 0)
+		target = getenv("HOME");
 	else if (ft_strcmp(argv[1], "-") == 0)
-		target = get_env(env, "OLDPWD");
+		target = getenv("OLDPWD");
 	else
 		target = argv[1];
 	return (target);
@@ -54,10 +56,15 @@ int	builtin_cd(char **argv, t_env **env)
 	char	*new_pwd;
 	char	*target;
 
+	if (argv[1] && argv[2])
+	{
+		ft_putstr_fd("minishell: cd: too many arguments\n", 2);
+		return (1);
+	}
 	old_pwd = getcwd(NULL, 0);
 	if (!old_pwd)
 		return (1);
-	target = get_target(argv, *env);
+	target = get_target(argv);
 	if (!target)
 		return (print_error(argv, target, old_pwd));
 	if (chdir(target) != 0)
