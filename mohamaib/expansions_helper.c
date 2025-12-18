@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/12 23:04:03 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/17 18:58:43 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/18 21:39:43 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,59 @@ int	count_dollars(t_segment seg)
 	doll_count = 0;
 	while (seg.str[i])
 	{
-		if (seg.str[i] == '$')
+		if (seg.str[i] == '$' && seg.str[i + 1] == '$')
+		{
+			doll_count++;
+			i += 2;
+			continue;
+		}
+		else if (seg.str[i] == '$' && seg.str[i + 1] != '$')
 			doll_count++;
 		i++;
 	}
 	return (doll_count);
+}
+
+static int	count_digits(int n)
+{
+	int	digits;
+
+	digits = 0;
+	if (n <= 0)
+		digits = 1;
+	while (n)
+	{
+		n /= 10;
+		digits++;
+	}
+	return (digits);
+}
+
+char	*gc_ft_itoa(int n, t_gc *gc)
+{
+	int		len;
+	char	*str;
+	long	nb;
+
+	nb = n;
+	len = count_digits(n);
+	str = gc_malloc((len + 1), gc);
+	if (!str)
+		return (NULL);
+	str[len--] = '\0';
+	if (nb < 0)
+	{
+		str[0] = '-';
+		nb = -nb;
+	}
+	if (nb == 0)
+		str[0] = '0';
+	while (nb > 0)
+	{
+		str[len--] = (nb % 10) + '0';
+		nb /= 10;
+	}
+	return (str);
 }
 
 char	*replace_val_in_env(char *val, t_env **env, t_gc *gc)
@@ -39,6 +87,12 @@ char	*replace_val_in_env(char *val, t_env **env, t_gc *gc)
 		if (exit_status)
 			return (gc_ft_strdup(exit_status, gc));
 		return (gc_ft_strdup("0", gc));
+	}
+	if (ft_strcmp(val, "$") == 0)
+	{
+		char	*pid;
+		pid = gc_ft_itoa(getpid(), gc);
+		return (gc_ft_strdup(pid, gc));
 	}
 	tmp = (*env);
 	while (tmp)

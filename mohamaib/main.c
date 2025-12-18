@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/17 18:21:05 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/18 20:53:52 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 		return ;
 	add_history(line);
 	tokens = tokenize_input(line, gc);
-	// print_token_list(tokens);
+	print_token_list(tokens);
 	ast = parse_pipeline(&tokens, env, gc);
 	reset_signal();
 	setup_signals_heredoc();
@@ -48,7 +48,7 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 		return ;
 	}
 	mark_builtins(ast);
-	// print_ast(ast);
+	print_ast(ast);
 	if (ast)
 	{
 		setup_signals_exec();

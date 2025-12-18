@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/17 19:11:45 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/18 19:52:44 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,8 @@
 # include <termios.h>
 # include <unistd.h>
 # include <signal.h>
-#include <sys/ioctl.h>
-#include <sys/stat.h>
+# include <sys/ioctl.h>
+# include <sys/stat.h>
 
 
 extern volatile sig_atomic_t g_signal;

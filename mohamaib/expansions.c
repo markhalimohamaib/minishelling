@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/30 20:00:26 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/17 19:09:01 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/18 21:00:11 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ char	*check_for_dollar(t_segment seg, t_env **env, t_gc *gc)
 	val_init.i = 0;
 	val_init.j = 0;
 	val_init.z = 0;
+	count = 0;
 	if (!(ft_strchr(seg.str, '$')))
 		return (seg.str);
 	count = count_dollars(seg);
@@ -68,6 +69,11 @@ void	initialize(t_val_full_init *val_init, t_segment *seg)
 	if (seg->str[val_init->i] == '?')
 	{
 		val_init->expand_val[val_init->j++] = '?';
+		val_init->i++;
+	}
+	else if (seg->str[val_init->i] == '$')
+	{
+		val_init->expand_val[val_init->j++] = '$';
 		val_init->i++;
 	}
 	else if (!seg->str[val_init->i] || seg->str[val_init->i] == ' ' 

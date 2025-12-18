@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/17 18:19:34 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/17 18:39:04 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/18 19:18:39 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,9 @@ static int	ft_atoi_shlvl(const char *str)
 			sign = -1;
 		i++;
 	}
-	if (!isdigit(str[i]))
+	if (!ft_isdigit(str[i]))
 		return (0);
-	while (isdigit(str[i]))
+	while (ft_isdigit(str[i]))
 	{
 		result = result * 10 + (str[i] - '0');
 		if (result * sign > 2147483647 || result * sign < -2147483648)
@@ -50,11 +50,11 @@ static int	is_valid_shlvl(const char *str)
 		i++;
 	if (str[i] == '+' || str[i] == '-')
 		i++;
-	if (!isdigit(str[i]))
+	if (!ft_isdigit(str[i]))
 		return (0);
 	while (str[i])
 	{
-		if (!isdigit(str[i]))
+		if (!ft_isdigit(str[i]))
 			return (0);
 		i++;
 	}
