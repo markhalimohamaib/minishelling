@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/12 23:04:03 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/18 21:39:43 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/19 20:05:53 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,7 @@ int	count_dollars(t_segment seg)
 		if (seg.str[i] == '$' && seg.str[i + 1] == '$')
 		{
 			doll_count++;
-			i += 2;
-			continue;
+			i++;
 		}
 		else if (seg.str[i] == '$' && seg.str[i + 1] != '$')
 			doll_count++;
@@ -103,7 +102,7 @@ char	*replace_val_in_env(char *val, t_env **env, t_gc *gc)
 		}
 		tmp = tmp->next;
 	}
-	return (gc_ft_strdup("", gc));
+	return (NULL);
 }
 
 int	get_lead_val_size(t_segment seg)

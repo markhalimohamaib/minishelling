@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/18 19:52:44 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/19 19:10:30 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -255,7 +255,7 @@ int						count_segments(const char *org);
 /* expansions.c */
 char					*check_for_dollar(t_segment seg, t_env **env, t_gc *gc);
 int						check_char(t_segment seg, int i);
-void					initialize(t_val_full_init *val_init, t_segment *seg);
+void					initialize(t_val_full_init *val_init, t_segment *seg, t_gc *gc);
 void					initialize2(t_val_full_init *val_init, t_segment *seg,
 							t_gc *gc, t_env **env);
 

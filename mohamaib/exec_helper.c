@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/11 19:19:25 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/11 19:38:04 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/19 19:43:27 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ char	*ft_strjoin_plus(char const *s1, char const *s2, char const *s3,
 	int		j;
 	int		w;
 
-	if (!s1 && !s2)
+	if (!s1 && !s2 && !s3)
 		return (NULL);
 	new = gc_malloc(sizeof(char) * (ft_strlen(s1) + ft_strlen(s2)
 				+ ft_strlen(s3) + 1), gc);
