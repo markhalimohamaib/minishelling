@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 20:29:10 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/17 17:09:39 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/20 21:43:58 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,6 @@ int	get_exit_code_from_status(int status)
 		return (WEXITSTATUS(status));
 	else if (WIFSIGNALED(status))
 	{
-		/* Handle signals: ctrl-C returns 130, ctrl-\ returns 131 */
 		if (WTERMSIG(status) == SIGINT)
 			return (130);
 		else if (WTERMSIG(status) == SIGQUIT)

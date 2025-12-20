@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 13:45:01 by markhali          #+#    #+#             */
-/*   Updated: 2025/11/12 13:33:50 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/20 22:10:52 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ void	set_env(t_env **env, const char *key, const char *value)
 {
 	t_env	*tmp;
 	t_env	*new;
+	t_env	*last;
 
 	tmp = *env;
 	while (tmp)
@@ -88,6 +89,17 @@ void	set_env(t_env **env, const char *key, const char *value)
 	new = create_new_env(key, value);
 	if (!new)
 		return ;
-	new->next = *env;
-	*env = new;
+	if (!*env)
+	{
+		*env = new;
+		new->next = NULL;
+	}
+	else
+	{
+		last = *env;
+		while (last->next)
+			last = last->next;
+		last->next = new;
+		new->next = NULL;
+	}
 }

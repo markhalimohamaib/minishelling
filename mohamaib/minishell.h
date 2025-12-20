@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/19 19:10:30 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/20 21:23:31 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@
 # include <signal.h>
 # include <sys/ioctl.h>
 # include <sys/stat.h>
-
 
 extern volatile sig_atomic_t g_signal;
 
@@ -317,5 +316,9 @@ void					set_exit_status(t_env **env, int status, char *buffer);
 
 /* shlvl.c */
 void					init_shlvl(t_env **env);
+
+
+
+int		check_syntax(char *line);
 
 #endif

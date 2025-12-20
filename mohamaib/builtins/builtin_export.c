@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 15:55:04 by markhali          #+#    #+#             */
-/*   Updated: 2025/11/12 10:34:35 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/20 22:13:27 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,16 +33,95 @@ int	is_valid_identifier(const char *str)
 	return (1);
 }
 
+static t_env	*copy_env_node(t_env *node)
+{
+	t_env	*new;
+
+	new = malloc(sizeof(t_env));
+	if (!new)
+		return (NULL);
+	new->key = ft_strdup(node->key);
+	if (!new->key)
+	{
+		free(new);
+		return (NULL);
+	}
+	if (node->value)
+	{
+		new->value = ft_strdup(node->value);
+		if (!new->value)
+		{
+			free(new->key);
+			free(new);
+			return (NULL);
+		}
+	}
+	else
+		new->value = NULL;
+	new->next = NULL;
+	return (new);
+}
+
+static t_env	*sort_env_list(t_env *env)
+{
+	t_env	*sorted;
+	t_env	*current;
+	t_env	*new_node;
+	t_env	*tmp;
+	t_env	*prev;
+
+	sorted = NULL;
+	current = env;
+	while (current)
+	{
+		new_node = copy_env_node(current);
+		if (!new_node)
+		{
+			free_env(sorted);
+			return (NULL);
+		}
+		if (!sorted || ft_strcmp(new_node->key, sorted->key) < 0)
+		{
+			new_node->next = sorted;
+			sorted = new_node;
+		}
+		else
+		{
+			tmp = sorted;
+			prev = NULL;
+			while (tmp && ft_strcmp(new_node->key, tmp->key) > 0)
+			{
+				prev = tmp;
+				tmp = tmp->next;
+			}
+			new_node->next = tmp;
+			if (prev)
+				prev->next = new_node;
+		}
+		current = current->next;
+	}
+	return (sorted);
+}
+
 static void	print_export(t_env *env)
 {
-	while (env)
+	t_env	*sorted;
+	t_env	*tmp;
+
+	sorted = sort_env_list(env);
+	if (!sorted)
+		return ;
+	
+	tmp = sorted;
+	while (tmp)
 	{
-		if (env->value)
-			printf("declare -x %s=\"%s\"\n", env->key, env->value);
+		if (tmp->value)
+			printf("declare -x %s=\"%s\"\n", tmp->key, tmp->value);
 		else
-			printf("declare -x %s\n", env->key);
-		env = env->next;
+			printf("declare -x %s\n", tmp->key);
+		tmp = tmp->next;
 	}
+	free_env(sorted);
 }
 
 static void	handle_export_with_value(t_env **env, char *arg)

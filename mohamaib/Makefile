@@ -6,7 +6,7 @@
 #    By: markhali <markhali@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#              #
-#    Updated: 2025/12/17 18:21:41 by markhali         ###   ########.fr        #
+#    Updated: 2025/12/20 21:26:39 by markhali         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -42,7 +42,8 @@ SRCS		= main.c \
 			  heredoc_redir.c \
 			  signals.c \
 			  exit_status.c \
-			  shlvl.c
+			  shlvl.c \
+			  syntax_checks.c
 
 BUILTIN_DIR	= builtins
 BUILTIN_SRCS = $(BUILTIN_DIR)/builtin_cd.c \
