@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/11 18:59:39 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/23 19:12:00 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,4 +44,19 @@ t_token	*create_token(t_token_type type, char *value, t_gc *gc)
 	new->herdoc_expand = 0;
 	new->next = NULL;
 	return (new);
+}
+
+void	handle_quoted_word(char *str, t_token **head, int *i, t_gc *gc)
+{
+	char	*word;
+	int		size;
+	t_token	*token;
+
+	size = word_len(str, (*i));
+	word = extract_word(str, i, size, gc);
+	token = create_token(T_WORD, NULL, gc);
+	token->origin_val = gc_ft_strdup(word, gc);
+	token->segment = build_segment(token, gc);
+	token->value = remove_quotes_and_track(token, word, size, gc);
+	add_token_to_list(head, token);
 }

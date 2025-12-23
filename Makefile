@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: markhali <markhali@student.42.fr>          +#+  +:+       +#+         #
+#    By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#              #
-#    Updated: 2025/12/20 21:26:39 by markhali         ###   ########.fr        #
+#    Updated: 2025/12/23 20:05:36 by mohamaib         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,9 +41,11 @@ SRCS		= main.c \
 			  read_heredoc.c \
 			  heredoc_redir.c \
 			  signals.c \
+			  setup_signals.c \
 			  exit_status.c \
 			  shlvl.c \
-			  syntax_checks.c
+			  syntax_checks.c \
+			  syntax_helper.c
 
 BUILTIN_DIR	= builtins
 BUILTIN_SRCS = $(BUILTIN_DIR)/builtin_cd.c \
@@ -51,6 +53,7 @@ BUILTIN_SRCS = $(BUILTIN_DIR)/builtin_cd.c \
 			   $(BUILTIN_DIR)/builtin_env.c \
 			   $(BUILTIN_DIR)/builtin_exit.c \
 			   $(BUILTIN_DIR)/builtin_export.c \
+			   $(BUILTIN_DIR)/builtin_export_helper.c \
 			   $(BUILTIN_DIR)/builtin_pwd.c \
 			   $(BUILTIN_DIR)/builtin_unset.c \
 			   $(BUILTIN_DIR)/env_getset.c \

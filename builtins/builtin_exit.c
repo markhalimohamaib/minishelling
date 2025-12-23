@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_exit.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 19:04:08 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/17 17:38:08 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/23 18:56:13 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ static int	is_numeric(const char *str)
 
 int	builtin_exit(char **argv, t_env **env)
 {
-	int	exit_code;
+	int		exit_code;
 	char	exit_str[12];
 
 	printf("exit\n");

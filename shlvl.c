@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   shlvl.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/17 18:19:34 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/18 19:18:39 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/23 20:08:43 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,13 @@
 
 static int	ft_atoi_shlvl(const char *str)
 {
-	long	result = 0;
-	int		sign = 1;
-	int		i = 0;
+	long	result;
+	int		sign;
+	int		i;
 
+	result = 0;
+	sign = 1;
+	i = 0;
 	if (!str)
 		return (0);
 	while (str[i] && (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13)))
@@ -42,8 +45,9 @@ static int	ft_atoi_shlvl(const char *str)
 
 static int	is_valid_shlvl(const char *str)
 {
-	int i = 0;
+	int	i;
 
+	i = 0;
 	if (!str || !str[0])
 		return (0);
 	while (str[i] && (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13)))
@@ -63,17 +67,22 @@ static int	is_valid_shlvl(const char *str)
 
 static char	*int_to_str(int n, char *buffer)
 {
-	int	i = 0;
-	int temp = n;
-	int	is_neg = 0;
-	int len = 0;
-	int tmp = temp;
+	int	i;
+	int	temp;
+	int	is_neg;
+	int	len;
+	int	tmp;
 
+	i = 0;
+	temp = n;
+	is_neg = 0;
+	len = 0;
+	tmp = temp;
 	if (n == 0)
 	{
 		buffer[0] = '0';
 		buffer[1] = '\0';
-		return buffer;
+		return (buffer);
 	}
 	if (n < 0)
 	{
@@ -87,7 +96,6 @@ static char	*int_to_str(int n, char *buffer)
 	}
 	buffer[len + is_neg] = '\0';
 	i = len + is_neg - 1;
-
 	while (temp > 0)
 	{
 		buffer[i--] = (temp % 10) + '0';
@@ -95,8 +103,7 @@ static char	*int_to_str(int n, char *buffer)
 	}
 	if (is_neg)
 		buffer[0] = '-';
-
-	return buffer;
+	return (buffer);
 }
 
 void	init_shlvl(t_env **env)

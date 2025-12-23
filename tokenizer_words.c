@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenizer_words.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/11 19:00:16 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/23 19:11:53 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,54 +61,46 @@ void	handle_expansion_char(t_token *token, char *str, int *i,
 		result[(*j)++] = str[(*i)++];
 }
 
-char	*remove_quotes_and_track(t_token *token, char *str, int size, t_gc *gc)
+static void	set_token_state(int *j, char **result, t_token **token, char **str)
 {
-	int		i;
-	int		j;
-	char	*result;
+	int	i;
 
 	i = 0;
-	j = 0;
-	token->state = NORMAL;
-	token->expand_line = 0;
-	result = gc_malloc(sizeof(char) * (size + 1), gc);
-	while (str[i])
+	while ((*str)[i])
 	{
-		if (token->state == NORMAL && (str[i] == '\'' || str[i] == '\"'))
+		if ((*token)->state == NORMAL && ((*str)[i] == '\''
+			|| (*str)[i] == '\"'))
 		{
-			if (str[i] == '\'')
-				token->state = IN_SINGLE;
+			if ((*str)[i] == '\'')
+				(*token)->state = IN_SINGLE;
 			else
-				token->state = IN_DOUBLE;
+				(*token)->state = IN_DOUBLE;
 		}
-		else if (token->state == IN_SINGLE && str[i] == '\'')
-			token->state = NORMAL;
-		else if (token->state == IN_DOUBLE && str[i] == '\"')
-			token->state = NORMAL;
+		else if ((*token)->state == IN_SINGLE && (*str)[i] == '\'')
+			(*token)->state = NORMAL;
+		else if ((*token)->state == IN_DOUBLE && (*str)[i] == '\"')
+			(*token)->state = NORMAL;
 		else
 		{
-			handle_expansion_char(token, str, &i, &j, result);
+			handle_expansion_char(*token, *str, &i, &(*j), *result);
 			continue ;
 		}
 		i++;
 	}
-	result[j] = '\0';
-	return (result);
 }
 
-void	handle_quoted_word(char *str, t_token **head, int *i, t_gc *gc)
+char	*remove_quotes_and_track(t_token *token, char *str, int size, t_gc *gc)
 {
-	char	*word;
-	int		size;
-	t_token	*token;
+	int		j;
+	char	*result;
 
-	size = word_len(str, (*i));
-	word = extract_word(str, i, size, gc);
-	token = create_token(T_WORD, NULL, gc);
-	token->origin_val = gc_ft_strdup(word, gc);
-	token->segment = build_segment(token, gc);
-	token->value = remove_quotes_and_track(token, word, size, gc);
-	add_token_to_list(head, token);
+	j = 0;
+	token->state = NORMAL;
+	token->expand_line = 0;
+	result = gc_malloc(sizeof(char) * (size + 1), gc);
+	set_token_state(&j, &result, &token, &str);
+	result[j] = '\0';
+	return (result);
 }
 
 void	handle_regular_word(char *str, t_token **head, int *i, t_gc *gc)

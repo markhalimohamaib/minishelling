@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_getset.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 13:45:01 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/20 22:10:52 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/23 18:32:50 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,11 +70,31 @@ static t_env	*create_new_env(const char *key, const char *value)
 	return (new);
 }
 
+static void	set_new_env(t_env	**new, t_env **env)
+{
+	t_env	*last;
+
+	if (!(*new))
+		return ;
+	if (!*env)
+	{
+		*env = (*new);
+		(*new)->next = NULL;
+	}
+	else
+	{
+		last = *env;
+		while (last->next)
+			last = last->next;
+		last->next = (*new);
+		(*new)->next = NULL;
+	}
+}
+
 void	set_env(t_env **env, const char *key, const char *value)
 {
 	t_env	*tmp;
 	t_env	*new;
-	t_env	*last;
 
 	tmp = *env;
 	while (tmp)
@@ -87,19 +107,5 @@ void	set_env(t_env **env, const char *key, const char *value)
 		tmp = tmp->next;
 	}
 	new = create_new_env(key, value);
-	if (!new)
-		return ;
-	if (!*env)
-	{
-		*env = new;
-		new->next = NULL;
-	}
-	else
-	{
-		last = *env;
-		while (last->next)
-			last = last->next;
-		last->next = new;
-		new->next = NULL;
-	}
+	set_new_env(&new, env);
 }
