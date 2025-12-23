@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/16 18:43:44 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/17 17:49:00 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/22 22:29:45 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,6 @@ void	execute(t_node *node, t_env **env, t_gc *gc)
 		if (check_result != 0)
 			exit(check_result);
 		execve(cmd, node->cmd, envp);
-		perror(cmd);
 		exit(127);
 	}
 	while (dirs[i])

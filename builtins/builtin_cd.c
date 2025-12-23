@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_cd.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 14:04:23 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/17 18:07:44 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/22 22:31:11 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-static char	*get_target(char **argv)
+static char	*get_target(char **argv, t_env *env)
 {
 	char	*target;
 
@@ -21,7 +21,7 @@ static char	*get_target(char **argv)
 	else if (ft_strcmp(argv[1], "~") == 0)
 		target = getenv("HOME");
 	else if (ft_strcmp(argv[1], "-") == 0)
-		target = getenv("OLDPWD");
+		target = get_env(env, "OLDPWD");
 	else
 		target = argv[1];
 	return (target);
@@ -62,9 +62,9 @@ int	builtin_cd(char **argv, t_env **env)
 		return (1);
 	}
 	old_pwd = getcwd(NULL, 0);
-	if (!old_pwd)
+	if (!old_pwd && ft_strcmp(argv[1], "~") != 0)
 		return (1);
-	target = get_target(argv);
+	target = get_target(argv, (*env));
 	if (!target)
 		return (print_error(argv, target, old_pwd));
 	if (chdir(target) != 0)

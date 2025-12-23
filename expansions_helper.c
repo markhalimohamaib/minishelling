@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansions_helper.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/12 23:04:03 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/19 20:05:53 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/20 23:21:40 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ int	get_lead_val_size(t_segment seg)
 		i++;
 		size++;
 	}
-	return (size);
+	return (size + 1);
 }
 
 int	get_expandable_size(t_segment seg)
@@ -142,5 +142,5 @@ int	get_expandable_size(t_segment seg)
 		}
 		i++;
 	}
-	return (size);
+	return (size + 1);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expansions.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/30 20:00:26 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/19 20:34:02 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/22 19:18:47 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ char	*check_for_dollar(t_segment seg, t_env **env, t_gc *gc)
 	val_init.full_all = gc_ft_strdup("\0", gc);
 	while (count)
 	{
+		// init(&val_init);
 		initialize(&val_init, &seg, gc);
 		initialize2(&val_init, &seg, gc, env);
 		count--;
@@ -52,13 +53,19 @@ int	check_char(t_segment seg, int i)
 	return (0);
 }
 
+void	init(t_val_full_init *val_init)
+{
+	val_init->j = 0;
+}
+
 void	initialize(t_val_full_init *val_init, t_segment *seg, t_gc *gc)
 {
+	val_init->j = 0;
 	val_init->expand_val = gc_malloc(sizeof(char)
-			* (get_expandable_size((*seg)) + 1), gc);
+			* (get_expandable_size((*seg)) + 2), gc);
 	val_init->expand_val[0] = '\0';
 	val_init->leading_val = gc_malloc(sizeof(char)
-			* (get_lead_val_size((*seg)) + 1), gc);
+			* (get_lead_val_size((*seg)) + 2), gc);
 	val_init->leading_val[0] = '\0';
 	while (seg->str[val_init->i] != '$')
 		val_init->leading_val[val_init->j++] = seg->str[val_init->i++];
@@ -80,7 +87,7 @@ void	initialize(t_val_full_init *val_init, t_segment *seg, t_gc *gc)
 		|| seg->str[val_init->i] == '\t' || seg->str[val_init->i] == '$'
 		|| seg->str[val_init->i] == '\"' || seg->str[val_init->i] == '\''
 		|| seg->str[val_init->i] == '|' || seg->str[val_init->i] == '<'
-		|| seg->str[val_init->i] == '>')
+		|| seg->str[val_init->i] == '>' || !check_char((*seg), val_init->i))
 	{
     	val_init->leading_val = gc_ft_strjoin(val_init->leading_val, "$", gc);
     	val_init->expand_val[0] = '\0';

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/20 21:24:28 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/20 22:57:58 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,14 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 
 	if (!line || line[0] == '\0')
 		return ;
+	add_history(line);
 	if (check_syntax(line))
 	{
 		set_exit_status(env, 2, exit_str);
 		return ;
 	}
-	add_history(line);
 	tokens = tokenize_input(line, gc);
-	print_token_list(tokens);
+	// print_token_list(tokens);
 	ast = parse_pipeline(&tokens, env, gc);
 	reset_signal();
 	setup_signals_heredoc();
@@ -53,7 +53,7 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 		return ;
 	}
 	mark_builtins(ast);
-	print_ast(ast);
+	// print_ast(ast);
 	if (ast)
 	{
 		setup_signals_exec();
