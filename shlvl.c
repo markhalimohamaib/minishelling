@@ -6,40 +6,27 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/17 18:19:34 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/23 20:08:43 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/24 00:35:01 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	ft_atoi_shlvl(const char *str)
+int	ft_atoi_shlvl(const char *str)
 {
-	long	result;
-	int		sign;
 	int		i;
+	int		sign;
+	long	result;
 
-	result = 0;
-	sign = 1;
-	i = 0;
 	if (!str)
 		return (0);
-	while (str[i] && (str[i] == ' ' || (str[i] >= 9 && str[i] <= 13)))
-		i++;
-	if (str[i] == '-' || str[i] == '+')
-	{
-		if (str[i] == '-')
-			sign = -1;
-		i++;
-	}
+	i = skip_whitespace(str);
+	sign = parse_sign(str, &i);
 	if (!ft_isdigit(str[i]))
 		return (0);
-	while (ft_isdigit(str[i]))
-	{
-		result = result * 10 + (str[i] - '0');
-		if (result * sign > 2147483647 || result * sign < -2147483648)
-			return (0);
-		i++;
-	}
+	result = parse_digits(str, &i, sign);
+	if (result == 0 && is_overflow(result, sign))
+		return (0);
 	return ((int)(result * sign));
 }
 
@@ -65,42 +52,19 @@ static int	is_valid_shlvl(const char *str)
 	return (1);
 }
 
-static char	*int_to_str(int n, char *buffer)
+char	*int_to_str(int n, char *buffer)
 {
-	int	i;
-	int	temp;
-	int	is_neg;
 	int	len;
-	int	tmp;
+	int	is_neg;
 
-	i = 0;
-	temp = n;
-	is_neg = 0;
-	len = 0;
-	tmp = temp;
 	if (n == 0)
-	{
-		buffer[0] = '0';
-		buffer[1] = '\0';
-		return (buffer);
-	}
+		return (handle_zero_case(buffer));
+	is_neg = 0;
 	if (n < 0)
-	{
 		is_neg = 1;
-		temp = -temp;
-	}
-	while (tmp > 0)
-	{
-		tmp /= 10;
-		len++;
-	}
+	len = get_num_length(n);
 	buffer[len + is_neg] = '\0';
-	i = len + is_neg - 1;
-	while (temp > 0)
-	{
-		buffer[i--] = (temp % 10) + '0';
-		temp /= 10;
-	}
+	fill_buffer_with_digits(buffer, n, len + is_neg - 1);
 	if (is_neg)
 		buffer[0] = '-';
 	return (buffer);

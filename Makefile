@@ -6,7 +6,7 @@
 #    By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#              #
-#    Updated: 2025/12/23 20:05:36 by mohamaib         ###   ########.fr        #
+#    Updated: 2025/12/24 00:46:51 by mohamaib         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,10 +33,12 @@ SRCS		= main.c \
 			  exec_helper.c \
 			  exec_utils2.c \
 			  exec_utils3.c \
+			  exec_utils4.c \
 			  segment_build.c \
 			  segment_count.c \
 			  expansions.c \
 			  expansions_helper.c \
+			  expansions_helper2.c \
 			  heredoc.c \
 			  read_heredoc.c \
 			  heredoc_redir.c \
@@ -44,6 +46,8 @@ SRCS		= main.c \
 			  setup_signals.c \
 			  exit_status.c \
 			  shlvl.c \
+			  ft_atoi_shlvl_helpers.c \
+			  int_tostr_helpers.c \
 			  syntax_checks.c \
 			  syntax_helper.c
 

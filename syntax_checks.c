@@ -6,11 +6,35 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/20 21:23:11 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/23 19:52:40 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/23 22:04:06 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+static void	print_error_character(char c)
+{
+	if (!c)
+	{
+		ft_putstr_fd("minishell: syntax error near unexpected", 2);
+		ft_putstr_fd(" token 'newline'\n", 2);
+	}
+	else if (c == '|')
+	{
+		ft_putstr_fd("minishell: syntax error near unexpected", 2);
+		ft_putstr_fd(" token '|'\n", 2);
+	}
+	else if (c == '<')
+	{
+		ft_putstr_fd("minishell: syntax error near unexpected", 2);
+		ft_putstr_fd(" token '<'\n", 2);
+	}
+	else if (c == '>')
+	{
+		ft_putstr_fd("minishell: syntax error near unexpected", 2);
+		ft_putstr_fd(" token '>'\n", 2);
+	}
+}
 
 static int	check_redir_helper(char **str, int *i, char	*redir)
 {
@@ -23,18 +47,7 @@ static int	check_redir_helper(char **str, int *i, char	*redir)
 	if (!(*str)[(*i)] || (*str)[(*i)] == '|' || (*str)[(*i)] == '<'\
 		|| (*str)[(*i)] == '>')
 	{
-		if (!(*str)[(*i)])
-			ft_putstr_fd("minishell: syntax error near unexpected \
-				token 'newline'\n", 2);
-		else if ((*str)[(*i)] == '|')
-			ft_putstr_fd("minishell: syntax error near unexpected \
-				token '|'\n", 2);
-		else if ((*str)[(*i)] == '<')
-			ft_putstr_fd("minishell: syntax error near unexpected \
-				token '<'\n", 2);
-		else if ((*str)[(*i)] == '>')
-			ft_putstr_fd("minishell: syntax error near unexpected \
-				token '>'\n", 2);
+		print_error_character((*str)[(*i)]);
 		return (1);
 	}
 	return (0);

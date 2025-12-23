@@ -6,78 +6,11 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/16 18:43:44 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/22 22:29:45 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/24 00:04:37 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-char	*env_join_kv(char *key, char *value, t_gc *gc)
-{
-	char	*str;
-	size_t	klen;
-	size_t	vlen;
-
-	klen = ft_strlen(key);
-	vlen = ft_strlen(value);
-	str = gc_malloc(klen + vlen + 2, gc);
-	if (!str)
-		return (NULL);
-	ft_memcpy(str, key, klen);
-	str[klen] = '=';
-	ft_memcpy(str + klen + 1, value, vlen);
-	str[klen + 1 + vlen] = '\0';
-	return (str);
-}
-
-int	env_fill_array(char **arr, t_env *env, t_gc *gc)
-{
-	int	i;
-
-	i = 0;
-	while (env)
-	{
-		if (env->value)
-		{
-			arr[i] = env_join_kv(env->key, env->value, gc);
-			if (!arr[i])
-				return (1);
-			i++;
-		}
-		env = env->next;
-	}
-	arr[i] = NULL;
-	return (0);
-}
-
-char	**env_to_array(t_env *env, t_gc *gc)
-{
-	char	**arr;
-	int		size;
-
-	size = env_count(env);
-	arr = gc_malloc(sizeof(char *) * (size + 1), gc);
-	if (!arr)
-		return (NULL);
-	if (env_fill_array(arr, env, gc))
-		return (NULL);
-	return (arr);
-}
-
-char	*get_path(char **env, t_gc *gc)
-{
-	int		i;
-	char	*path;
-
-	i = 0;
-	while (env[i])
-	{
-		if (ft_strncmp(env[i], "PATH=", 5) == 0)
-			path = gc_ft_strdup(env[i] + 5, gc);
-		i++;
-	}
-	return (path);
-}
 
 int	check_command_type(char *cmd)
 {
@@ -99,41 +32,47 @@ int	check_command_type(char *cmd)
 	return (0);
 }
 
+void	init_child(t_child_vars *child, t_node *node, t_env **env, t_gc *gc)
+{
+	child->i = 0;
+	child->envp = env_to_array((*env), gc);
+	child->path = get_path(child->envp, gc);
+	child->dirs = gc_ft_split(child->path, ':', gc);
+	child->cmd = gc_ft_strdup(node->cmd[0], gc);
+}
+
+void	handle_executable(t_child_vars *child, t_node *node, int *check_result)
+{
+	(*check_result) = check_command_type(child->cmd);
+	if ((*check_result) != 0)
+		exit((*check_result));
+	execve(child->cmd, node->cmd, child->envp);
+	exit(127);
+}
+
 void	execute(t_node *node, t_env **env, t_gc *gc)
 {
-	int		i;
-	char	*cmd;
-	char	**envp;
-	char	*path;
-	char	**dirs;
-	int		check_result;
+	int				check_result;
+	t_child_vars	*child;
 
-	i = 0;
-	envp = env_to_array((*env), gc);
-	path = get_path(envp, gc);
-	dirs = gc_ft_split(path, ':', gc);
-	cmd = gc_ft_strdup(node->cmd[0], gc);
+	child = gc_malloc(sizeof(child), gc);
+	init_child(child, node, env, gc);
 	setup_signals_child();
-	if (ft_strchr(cmd, '/'))
+	if (ft_strchr(child->cmd, '/'))
+		handle_executable(child, node, &check_result);
+	while (child->dirs[child->i])
 	{
-		check_result = check_command_type(cmd);
-		if (check_result != 0)
-			exit(check_result);
-		execve(cmd, node->cmd, envp);
-		exit(127);
-	}
-	while (dirs[i])
-	{
-		cmd = ft_strjoin_plus(dirs[i], "/", node->cmd[0], gc);
-		check_result = check_command_type(cmd);
+		child->cmd = ft_strjoin_plus(child->dirs[child->i], "/", node->cmd[0],
+				gc);
+		check_result = check_command_type(child->cmd);
 		if (check_result == 0)
 		{
-			execve(cmd, node->cmd, envp);
+			execve(child->cmd, node->cmd, child->envp);
 			exit(127);
 		}
 		else if (check_result == 126)
 			exit(126);
-		i++;
+		child->i++;
 	}
 	ft_putstr_fd(node->cmd[0], 2);
 	ft_putstr_fd(": command not found\n", 2);

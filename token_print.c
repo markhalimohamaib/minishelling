@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_print.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/06 00:31:48 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/10 20:31:47 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/23 21:48:06 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,8 @@ void	print_token_details(t_token *token)
 	int	i;
 
 	i = 0;
+	if (token->value)
+		printf(" | value2=%s", token->value);
 	if (token->state)
 		printf(" | state=%d", token->state);
 	if (token->origin_val && token->origin_val[0] != '\0')

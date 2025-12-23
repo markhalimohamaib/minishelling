@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/23 20:08:04 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/24 00:49:01 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,23 @@ typedef struct s_val_full_init
 	char						*full_all;
 }								t_val_full_init;
 
+typedef struct s_redir_processor
+{
+	int							i;
+	int							j;
+	char						*result;
+}								t_redir_processor;
+
+typedef struct s_child_vars
+{
+	int							i;
+	char						*cmd;
+	char						**envp;
+	char						*path;
+	char						**dirs;
+	int							check_result;
+}								t_child_vars;
+
 /* gc.c */
 void							gc_init(t_gc *gc);
 void							*gc_malloc(size_t size, t_gc *gc);
@@ -227,17 +244,11 @@ char							*ft_strjoin_plus(char const *s1, char const *s2,
 									char const *s3, t_gc *gc);
 int								env_count(t_env *env);
 
-/* exec_helper2.c */
-void							execute(t_node *node, t_env **env, t_gc *gc);
-int								exec_cmd(t_node *node, t_env **env, t_gc *gc);
-
 /* exec_utils.c */
-char							*env_join_kv(char *key, char *value, t_gc *gc);
-int								env_fill_array(char **arr, t_env *env,
-									t_gc *gc);
-char							**env_to_array(t_env *env, t_gc *gc);
 char							*get_path(char **env, t_gc *gc);
 int								check_command_type(char *cmd);
+void							execute(t_node *node, t_env **env, t_gc *gc);
+int								exec_cmd(t_node *node, t_env **env, t_gc *gc);
 
 /* exec_utils2.c */
 void							close_fds(int *fd);
@@ -255,6 +266,12 @@ int								handle_redir_append(t_node *node, t_env **env,
 									t_gc *gc);
 int								handle_redir_heredoc(t_node *node, t_env **env,
 									t_gc *gc);
+
+/* exec_utils4.c */
+char							*env_join_kv(char *key, char *value, t_gc *gc);
+int								env_fill_array(char **arr, t_env *env,
+									t_gc *gc);
+char							**env_to_array(t_env *env, t_gc *gc);
 
 /* segment_build.c */
 t_segment						*build_segment(t_token *token, t_gc *gc);
@@ -278,6 +295,17 @@ char							*replace_val_in_env(char *val, t_env **env,
 									t_gc *gc);
 int								get_lead_val_size(t_segment seg);
 int								get_expandable_size(t_segment seg);
+
+/* expansions_helper2.c */
+void							init_buffers(t_val_full_init *val_init,
+									t_segment *seg, t_gc *gc);
+void							extract_leading_value(t_val_full_init *val_init,
+									t_segment *seg);
+int								is_special_char_after_dollar(char c);
+void							handle_special_expansion(t_val_full_init *val_init,
+									t_segment *seg, t_gc *gc);
+void							find_next_dollar(t_val_full_init *val_init,
+									t_segment *seg);
 
 /* ./builtins */
 t_env							*init_env(char **envp);
@@ -345,6 +373,18 @@ void							set_exit_status(t_env **env, int status,
 
 /* shlvl.c */
 void							init_shlvl(t_env **env);
+
+/* ft_atoi_shlvl_helpers.c */
+int								skip_whitespace(const char *str);
+int								parse_sign(const char *str, int *i);
+int								is_overflow(long result, int sign);
+long							parse_digits(const char *str, int *i, int sign);
+
+/* int_tostr_helpers.c */
+int								get_num_length(int n);
+void							fill_buffer_with_digits(char *buffer, int num,
+									int pos);
+char							*handle_zero_case(char *buffer);
 
 /* syntax_checks.c */
 int								check_syntax(char *line);

@@ -3,26 +3,29 @@
 /*                                                        :::      ::::::::   */
 /*   exit_status.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 20:29:10 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/20 21:43:58 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/24 00:10:14 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+void	null_buffer(char **buffer)
+{
+	(*buffer)[0] = '0';
+	(*buffer)[1] = '\0';
+}
+
 void	set_exit_status(t_env **env, int status, char *buffer)
 {
-	int		i;
-	int		temp;
-	int		len;
+	int	i;
+	int	temp;
+	int	len;
 
 	if (status == 0)
-	{
-		buffer[0] = '0';
-		buffer[1] = '\0';
-	}
+		null_buffer(&buffer);
 	else
 	{
 		temp = status;

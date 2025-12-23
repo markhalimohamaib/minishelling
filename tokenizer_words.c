@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/23 19:11:53 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/23 21:36:08 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,28 +40,28 @@ char	*extract_word(char *str, int *i, int size, t_gc *gc)
 	return (word);
 }
 
-void	handle_expansion_char(t_token *token, char *str, int *i,
-			int *j, char *result)
+static void	handle_process_target(t_token *token, char *str, int *i,
+		t_redir_processor *pro)
 {
 	int	start_i;
 
 	if (str[*i] == '$' && token->state != IN_SINGLE)
 	{
 		start_i = *i;
-		while (str[*i] && str[*i] != '\'' && str[*i] != '\"'
-			&& str[*i] != ' ' && str[*i] != '\t'
-			&& str[*i] != '|' && str[*i] != '<' && str[*i] != '>')
+		while (str[*i] && str[*i] != '\'' && str[*i] != '\"' && str[*i] != ' '
+			&& str[*i] != '\t' && str[*i] != '|' && str[*i] != '<'
+			&& str[*i] != '>')
 		{
-			result[(*j)++] = str[(*i)++];
+			pro->result[pro->j++] = str[(*i)++];
 		}
 		if (*i > start_i)
 			token->expand_line = 1;
 	}
 	else
-		result[(*j)++] = str[(*i)++];
+		pro->result[pro->j++] = str[(*i)++];
 }
 
-static void	set_token_state(int *j, char **result, t_token **token, char **str)
+static void	set_token_state(t_redir_processor *pro, t_token **token, char **str)
 {
 	int	i;
 
@@ -82,7 +82,7 @@ static void	set_token_state(int *j, char **result, t_token **token, char **str)
 			(*token)->state = NORMAL;
 		else
 		{
-			handle_expansion_char(*token, *str, &i, &(*j), *result);
+			handle_process_target(*token, *str, &i, pro);
 			continue ;
 		}
 		i++;
@@ -91,16 +91,16 @@ static void	set_token_state(int *j, char **result, t_token **token, char **str)
 
 char	*remove_quotes_and_track(t_token *token, char *str, int size, t_gc *gc)
 {
-	int		j;
-	char	*result;
+	t_redir_processor	*pro;
 
-	j = 0;
+	pro = gc_malloc(sizeof(t_redir_processor), gc);
+	pro->j = 0;
 	token->state = NORMAL;
 	token->expand_line = 0;
-	result = gc_malloc(sizeof(char) * (size + 1), gc);
-	set_token_state(&j, &result, &token, &str);
-	result[j] = '\0';
-	return (result);
+	pro->result = gc_malloc(sizeof(char) * (size + 1), gc);
+	set_token_state(pro, &token, &str);
+	pro->result[pro->j] = '\0';
+	return (pro->result);
 }
 
 void	handle_regular_word(char *str, t_token **head, int *i, t_gc *gc)
