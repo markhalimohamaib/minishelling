@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+         #
+#    By: markhali <markhali@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#              #
-#    Updated: 2025/12/24 01:23:22 by mohamaib         ###   ########.fr        #
+#    Updated: 2025/12/24 14:49:48 by markhali         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,6 +18,7 @@ LIBFT_DIR	= libft
 LIBFT		= $(LIBFT_DIR)/libft.a
 
 SRCS		= main.c \
+			  process_line.c \
 			  gc.c \
 			  tokenizer.c \
 			  tokenizer_words.c \
@@ -25,8 +26,6 @@ SRCS		= main.c \
 			  parser.c \
 			  parser_build.c \
 			  parser_helper.c \
-			  ast_print.c \
-			  token_print.c \
 			  builtin_utils.c \
 			  exec.c \
 			  exec_utils.c \

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/24 01:28:07 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/24 14:50:32 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,21 +216,7 @@ t_node							*parse_simple_cmd(t_token **head, t_env **env,
 t_node							*parse_pipeline(t_token **head, t_env **env,
 									t_gc *gc);
 
-/* ast_print.c */
-void							print_indent(int depth);
-void							print_cmd_array(char **cmd);
-void							print_redir_type(t_token_type type,
-									char *filename);
-void							print_ast_node(t_node *node, int depth);
-void							print_ast(t_node *root);
-
-/* token_print.c */
-const char						*token_type_name(t_token_type type);
-void							print_token_details(t_token *token);
-void							print_token_list(t_token *head);
-
 /* main.c */
-int								should_exit(char *line);
 void							process_line(char *line, t_gc *gc, t_env **env);
 
 /* builtin_utils.c */
@@ -292,7 +278,6 @@ int								count_segments(const char *org);
 char							*check_for_dollar(t_segment seg, t_env **env,
 									t_gc *gc);
 int								check_char(t_segment seg, int i);
-void							init(t_val_full_init *val_init);
 void							initialize(t_val_full_init *val_init,
 									t_segment *seg, t_gc *gc);
 void							initialize2(t_val_full_init *val_init,
