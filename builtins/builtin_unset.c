@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_unset.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 19:03:48 by markhali          #+#    #+#             */
-/*   Updated: 2025/11/12 10:34:41 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/24 20:34:58 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,7 @@ int	builtin_unset(t_env **env, char **args)
 	while (args[i])
 	{
 		if (!is_valid_identifier(args[i]))
-		{
-			ft_putstr_fd("minishell: unset: `", 2);
-			ft_putstr_fd(args[i], 2);
-			ft_putstr_fd("': not a valid identifier\n", 2);
-			ret = 1;
-		}
+			ret = 0;
 		else
 			unset_env(env, args[i]);
 		i++;

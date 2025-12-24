@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/16 18:43:44 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/24 00:04:37 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/24 22:48:52 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	init_child(t_child_vars *child, t_node *node, t_env **env, t_gc *gc)
 {
 	child->i = 0;
 	child->envp = env_to_array((*env), gc);
-	child->path = get_path(child->envp, gc);
+	child->path = gc_ft_strdup(get_path(child->envp, gc), gc);
 	child->dirs = gc_ft_split(child->path, ':', gc);
 	child->cmd = gc_ft_strdup(node->cmd[0], gc);
 }
@@ -55,7 +55,7 @@ void	execute(t_node *node, t_env **env, t_gc *gc)
 	int				check_result;
 	t_child_vars	*child;
 
-	child = gc_malloc(sizeof(child), gc);
+	child = gc_malloc(sizeof(t_child_vars), gc);
 	init_child(child, node, env, gc);
 	setup_signals_child();
 	if (ft_strchr(child->cmd, '/'))

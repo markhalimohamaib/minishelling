@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/23 18:52:44 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/23 19:10:05 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/24 22:16:16 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ t_env	*copy_env_node(t_env *node)
 	return (new);
 }
 
-void	sort_env_helper(t_env	**sorted, t_env	**new_node)
+void	sort_env_helper(t_env **sorted, t_env **new_node)
 {
 	t_env	*tmp;
 	t_env	*prev;
@@ -99,10 +99,17 @@ void	print_export(t_env *env)
 	tmp = sorted;
 	while (tmp)
 	{
-		if (tmp->value)
+		if (tmp->value && ft_strcmp(tmp->key, "?"))
 			printf("declare -x %s=\"%s\"\n", tmp->key, tmp->value);
 		else
+		{
+			if (!ft_strcmp(tmp->key, "?"))
+			{
+				tmp = tmp->next;
+				continue ;
+			}
 			printf("declare -x %s\n", tmp->key);
+		}
 		tmp = tmp->next;
 	}
 	free_env(sorted);
