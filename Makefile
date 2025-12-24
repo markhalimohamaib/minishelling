@@ -6,7 +6,7 @@
 #    By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#              #
-#    Updated: 2025/12/24 00:46:51 by mohamaib         ###   ########.fr        #
+#    Updated: 2025/12/24 01:23:22 by mohamaib         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -39,8 +39,10 @@ SRCS		= main.c \
 			  expansions.c \
 			  expansions_helper.c \
 			  expansions_helper2.c \
+			  expansions_helper3.c \
 			  heredoc.c \
 			  read_heredoc.c \
+			  read_heredoc_helpers.c \
 			  heredoc_redir.c \
 			  signals.c \
 			  setup_signals.c \

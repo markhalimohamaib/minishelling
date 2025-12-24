@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/24 00:43:02 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/24 00:50:06 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/24 00:55:06 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int	is_special_char_after_dollar(char c)
 	return (0);
 }
 
-void	handle_special_expansion(t_val_full_init *val_init, t_segment *seg,
+void	handle_special_expan(t_val_full_init *val_init, t_segment *seg,
 		t_gc *gc)
 {
 	if (seg->str[val_init->i] == '?')

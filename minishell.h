@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/24 00:49:01 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/24 01:28:07 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -158,6 +158,15 @@ typedef struct s_child_vars
 	int							check_result;
 }								t_child_vars;
 
+typedef struct s_heredoc_vars
+{
+	int							*p;
+	const char					*delim;
+	int							expand;
+	t_env						**env;
+	t_gc						*gc;
+}								t_heredoc_vars;
+
 /* gc.c */
 void							gc_init(t_gc *gc);
 void							*gc_malloc(size_t size, t_gc *gc);
@@ -302,10 +311,13 @@ void							init_buffers(t_val_full_init *val_init,
 void							extract_leading_value(t_val_full_init *val_init,
 									t_segment *seg);
 int								is_special_char_after_dollar(char c);
-void							handle_special_expansion(t_val_full_init *val_init,
+void							handle_special_expan(t_val_full_init *val_init,
 									t_segment *seg, t_gc *gc);
 void							find_next_dollar(t_val_full_init *val_init,
 									t_segment *seg);
+
+/* expansions_helper3.c */
+char							*gc_ft_itoa(int n, t_gc *gc);
 
 /* ./builtins */
 t_env							*init_env(char **envp);
@@ -351,6 +363,17 @@ void							apply_redir_append(t_node *n);
 /* read_heredoc.c */
 int								read_heredoc(const char *delim, int expand,
 									t_env **env, t_gc *gc);
+void							print_heredoc_warning(const char *delim);
+void							write_expanded(t_segment seg, int fd,
+									t_env **env, t_gc *gc);
+void							write_raw(char *line, int fd);
+int								check_heredoc_signal(void);
+
+/* read_heredoc_helpers.c */
+int								handle_heredoc_line(char *line,
+									t_heredoc_vars *vars);
+void							process_heredoc_content(char *line,
+									t_heredoc_vars *here);
 
 /* signals.c */
 void							handle_sigint_interactive(int sig);
