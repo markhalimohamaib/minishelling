@@ -6,20 +6,20 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 10:29:31 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/25 16:58:35 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/25 18:41:00 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	execute_builtin(t_node *node, t_env **env)
+static int	execute_builtin(t_node *node, t_env **env, t_gc *gc)
 {
 	if (node->builtin == BLT_ECHO)
 		return (builtin_echo(node->cmd));
 	else if (node->builtin == BLT_PWD)
 		return (builtin_pwd());
 	else if (node->builtin == BLT_CD)
-		return (builtin_cd(node->cmd, env));
+		return (builtin_cd(node->cmd, env, gc));
 	else if (node->builtin == BLT_ENV)
 		return (builtin_env(*env));
 	else if (node->builtin == BLT_EXPORT)
@@ -36,7 +36,7 @@ int	execute_command(t_node *node, t_env **env, t_gc *gc)
 	if (!node || !node->cmd || !node->cmd[0])
 		return (0);
 	if (node->builtin != BLT_NONE)
-		return (execute_builtin(node, env));
+		return (execute_builtin(node, env, gc));
 	if (node->builtin == BLT_NONE)
 		return (exec_cmd(node, env, gc));
 	printf("minishell: command not found: %s\n", node->cmd[0]);
@@ -48,6 +48,7 @@ static int	handle_redir_node(t_node *node, t_env **env, t_gc *gc)
 	pid_t	pid;
 	int		status;
 
+	status = 0;
 	pid = fork();
 	if (pid < 0)
 	{

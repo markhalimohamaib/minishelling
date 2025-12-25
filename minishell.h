@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/24 14:50:32 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/25 18:40:38 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -314,7 +314,7 @@ void							free_env(t_env *env);
 
 int								builtin_echo(char **argv);
 int								builtin_pwd(void);
-int								builtin_cd(char **argv, t_env **env);
+int								builtin_cd(char **argv, t_env **env, t_gc *gc);
 int								builtin_env(t_env *env);
 int								builtin_export(t_env **env, char **args);
 int								builtin_unset(t_env **env, char **args);
