@@ -1,26 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
+/*   builtin_env.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/19 19:53:36 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/19 20:12:54 by markhali         ###   ########.fr       */
+/*   Created: 2025/10/04 15:38:11 by markhali          #+#    #+#             */
+/*   Updated: 2025/12/17 17:15:07 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stddef.h>
-#include "libft.h"
+#include "../minishell.h"
 
-size_t	ft_strlen(const char *str)
+int	builtin_env(t_env *env)
 {
-	int	i;
-
-	if (!str)
-		return (0);
-	i = 0;
-	while (str[i] != '\0')
-		i++;
-	return (i);
+	while (env)
+	{
+		if (env->value && env->key[0] != '?')
+			printf("%s=%s\n", env->key, env->value);
+		env = env->next;
+	}
+	return (0);
 }

@@ -1,26 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strlen.c                                        :+:      :+:    :+:   */
+/*   builtin_unset.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/05/19 19:53:36 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/19 20:12:54 by markhali         ###   ########.fr       */
+/*   Created: 2025/10/07 19:03:48 by markhali          #+#    #+#             */
+/*   Updated: 2025/12/24 20:34:58 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stddef.h>
-#include "libft.h"
+#include "../minishell.h"
 
-size_t	ft_strlen(const char *str)
+int	builtin_unset(t_env **env, char **args)
 {
 	int	i;
+	int	ret;
 
-	if (!str)
+	if (!args[1])
 		return (0);
-	i = 0;
-	while (str[i] != '\0')
+	ret = 0;
+	i = 1;
+	while (args[i])
+	{
+		if (!is_valid_identifier(args[i]))
+			ret = 0;
+		else
+			unset_env(env, args[i]);
 		i++;
-	return (i);
+	}
+	return (ret);
 }
