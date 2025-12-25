@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 20:24:40 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/16 19:31:21 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/25 21:26:08 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,9 @@ void	close_fds(int *fd)
 
 int	execute_pipe(t_node *node, t_env **env, t_gc *gc)
 {
-	int	exit_code;
 	int	status;
 
+	status = 0;
 	pipe(node->pipefd);
 	node->pid1 = fork();
 	if (node->pid1 == 0)
@@ -41,10 +41,10 @@ int	execute_pipe(t_node *node, t_env **env, t_gc *gc)
 		exit(execute_node(node->right, env, gc));
 	}
 	close_fds(node->pipefd);
+	setup_signals_exec();
 	waitpid(node->pid1, NULL, 0);
 	waitpid(node->pid2, &status, 0);
-	exit_code = get_exit_code_from_status(status);
-	return (exit_code);
+	return (get_exit_code_from_status(status));
 }
 
 int	execute_redir(t_node *node, t_env **env, t_gc *gc)

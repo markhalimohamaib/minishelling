@@ -3,28 +3,34 @@
 /*                                                        :::      ::::::::   */
 /*   builtin_cd.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/04 14:04:23 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/22 22:31:11 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/25 21:24:46 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-static char	*get_target(char **argv, t_env *env)
+static char	*get_target(char **argv, t_env *env, t_gc *gc)
 {
-	char	*target;
+	char	*home;
 
 	if (!argv[1] || !argv[1][0])
-		target = getenv("HOME");
-	else if (ft_strcmp(argv[1], "~") == 0)
-		target = getenv("HOME");
-	else if (ft_strcmp(argv[1], "-") == 0)
-		target = get_env(env, "OLDPWD");
-	else
-		target = argv[1];
-	return (target);
+		return (getenv("HOME"));
+	if (argv[1][0] == '~')
+	{
+		home = getenv("HOME");
+		if (!home)
+			return (NULL);
+		if (argv[1][1] == '\0')
+			return (home);
+		if (argv[1][1] == '/')
+			return (gc_ft_strjoin(home, (argv[1] + 1), gc));
+	}
+	if (ft_strcmp(argv[1], "-") == 0)
+		return (get_env(env, "OLDPWD"));
+	return (argv[1]);
 }
 
 static int	print_error(char **argv, char *target, char *old_pwd)
@@ -50,21 +56,19 @@ static int	print_error(char **argv, char *target, char *old_pwd)
 	return (1);
 }
 
-int	builtin_cd(char **argv, t_env **env)
+int	builtin_cd(char **argv, t_env **env, t_gc *gc)
 {
 	char	*old_pwd;
 	char	*new_pwd;
 	char	*target;
 
 	if (argv[1] && argv[2])
-	{
-		ft_putstr_fd("minishell: cd: too many arguments\n", 2);
-		return (1);
-	}
+		return (ft_putstr_fd("minishell: cd: too many arguments\n", 2), 1);
 	old_pwd = getcwd(NULL, 0);
-	if (!old_pwd && ft_strcmp(argv[1], "~") != 0)
+	if (!old_pwd && ft_strcmp(argv[1], "~") != 0 && ft_strcmp(argv[1],
+			"..") != 0)
 		return (1);
-	target = get_target(argv, (*env));
+	target = get_target(argv, (*env), gc);
 	if (!target)
 		return (print_error(argv, target, old_pwd));
 	if (chdir(target) != 0)

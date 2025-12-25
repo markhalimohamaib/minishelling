@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit_status.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/16 20:29:10 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/24 20:55:35 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/25 17:03:12 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,10 +60,7 @@ int	get_exit_code_from_status(int status)
 		if (WTERMSIG(status) == SIGINT)
 			return (130);
 		else if (WTERMSIG(status) == SIGQUIT)
-		{
-			write(2, "Quit (core dumped)\n", 19);
 			return (131);
-		}
 	}
 	return (1);
 }

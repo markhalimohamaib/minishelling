@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/24 14:45:17 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/25 17:30:20 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/25 17:04:29 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ static void	exec_node(t_node *ast, char *exit_str, t_env **env, t_gc *gc)
 	{
 		setup_signals_exec();
 		exit_status = execute_node(ast, env, gc);
+		if (exit_status == 131)
+			write(2, "Quit (core dumped)\n", 19);
 		setup_signals_interactive();
 		if (g_signal)
 		{

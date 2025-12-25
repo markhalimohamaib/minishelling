@@ -1,6 +1,6 @@
- echo hello > file | echo world > file | sleep 2 | echo  > file in this case the file should contain hello not a empty file 
-cd ~/Desktop is not working 
+# echo hello > file | echo world > file | sleep 2 | echo  > file in this case the file should contain hello not a empty file 
+# cd ~/Desktop is not working 
 mkdir -p a/b/c/d/e/f rm -fr HOME PWD OLDPWD and cd .. back to home is not working, it cause a segfault 
-cat > file , the a doesn't expand and the file created with the name file instead of what exist in a as env varibale
-enter the minishell without env using the -i flag should open without env and segfoult , it is not
-after two process running and press ctrl + \ , it cause leak
+# cat > file , the a doesn't expand and the file created with the name file instead of what exist in a as env varibale
+# enter the minishell without env using the -i flag should open without env and segfoult , it is not
+# after two process running and press ctrl + \ , it cause leak

@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/24 14:45:40 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/25 20:13:50 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,6 @@ static int	init_minishell(t_gc *gc, t_env **env, char **envp)
 {
 	gc_init(gc);
 	*env = init_env(envp);
-	if (!(*env))
-	{
-		ft_putstr_fd("minishell: failed to initialize environment\n", 2);
-		return (1);
-	}
 	init_shlvl(env);
 	setup_signals_interactive();
 	return (0);

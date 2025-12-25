@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils4.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/23 21:38:07 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/24 00:04:22 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/25 20:17:12 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ char	*get_path(char **env, t_gc *gc)
 	char	*path;
 
 	i = 0;
+	path = gc_ft_strdup("\0", gc);
 	while (env[i])
 	{
 		if (ft_strncmp(env[i], "PATH=", 5) == 0)
