@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
+/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/16 18:43:44 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/24 22:48:52 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/25 16:57:38 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,7 @@ int	exec_cmd(t_node *node, t_env **env, t_gc *gc)
 	node->pid1 = fork();
 	if (node->pid1 == 0)
 		execute(node, env, gc);
+	setup_signals_exec();
 	waitpid(node->pid1, &status, 0);
 	exit_code = get_exit_code_from_status(status);
 	return (exit_code);

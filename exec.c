@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 10:29:31 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/16 20:37:20 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/25 16:58:35 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ static int	handle_redir_node(t_node *node, t_env **env, t_gc *gc)
 		apply_redirs(node, env, gc);
 		exit(execute_node(node->left, env, gc));
 	}
+	setup_signals_exec();
 	waitpid(pid, &status, 0);
 	return (status >> 8);
 }

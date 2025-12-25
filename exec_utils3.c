@@ -6,7 +6,7 @@
 /*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 20:02:33 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/16 18:44:08 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/25 16:59:18 by markhali         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ int	handle_redir_in(t_node *node, t_env **env, t_gc *gc)
 		exit(execute_node(node->left, env, gc));
 	}
 	close(node->file_fd);
+	setup_signals_exec();
 	waitpid(node->pid1, &status, 0);
 	exit_code = get_exit_code_from_status(status);
 	return (exit_code);
@@ -57,6 +58,7 @@ int	handle_redir_out(t_node *node, t_env **env, t_gc *gc)
 		exit(execute_node(node->left, env, gc));
 	}
 	close(node->file_fd);
+	setup_signals_exec();
 	waitpid(node->pid1, &status, 0);
 	exit_code = get_exit_code_from_status(status);
 	return (exit_code);
@@ -82,6 +84,7 @@ int	handle_redir_append(t_node *node, t_env **env, t_gc *gc)
 		exit(execute_node(node->left, env, gc));
 	}
 	close(node->file_fd);
+	setup_signals_exec();
 	waitpid(node->pid1, &status, 0);
 	exit_code = get_exit_code_from_status(status);
 	return (exit_code);
