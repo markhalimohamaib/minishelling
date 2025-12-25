@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/12 23:04:03 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/24 01:04:04 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/25 18:04:53 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ int	get_lead_val_size(t_segment seg)
 
 	i = 0;
 	size = 0;
-	while (seg.str[i] != '$')
+	while (seg.str[i] && seg.str[i] != '$')
 	{
 		i++;
 		size++;

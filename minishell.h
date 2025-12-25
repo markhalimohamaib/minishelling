@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
 /*   Updated: 2025/12/25 18:40:38 by markhali         ###   ########.fr       */
@@ -59,6 +59,7 @@ typedef struct s_gc_node
 typedef struct s_gc
 {
 	t_gc_node					*list;
+	t_env						**envf;
 }								t_gc;
 
 typedef enum e_token_type
@@ -182,7 +183,8 @@ t_token							*create_token(t_token_type type, char *value,
 									t_gc *gc);
 void							handle_operator(char *str, t_token **head,
 									int *i, t_gc *gc);
-t_token							*tokenize_input(char *str, t_gc *gc);
+t_token							*tokenize_input(char *str, t_gc *gc,
+									t_env **env);
 
 /* tokenizer_words.c */
 char							*extract_word(char *str, int *i, int size,
@@ -269,6 +271,13 @@ int								env_fill_array(char **arr, t_env *env,
 char							**env_to_array(t_env *env, t_gc *gc);
 
 /* segment_build.c */
+char							*read_single_quoted(char *origin, int *i,
+									t_gc *gc);
+char							*read_double_quoted(char *origin, int *i,
+									t_gc *gc);
+char							*read_unquoted(char *origin, int *i, t_gc *gc);
+void							set_segment(t_segment *seg, char *str,
+									t_token_state state, int expands);
 t_segment						*build_segment(t_token *token, t_gc *gc);
 
 /* segment_count.c */
@@ -404,5 +413,14 @@ int								handle_pipe(char *str, int *i,
 									int *has_content);
 int								check_pipe_helper(int *i, char *str);
 int								check_pipe_syntax(char *str);
+
+/* filename_seg.c */
+t_segment						*filename_seg(t_token *token, t_gc *gc);
+char							*check_for_filename(t_segment seg, t_env **env,
+									t_gc *gc);
+
+/* printing.c */
+void							print_token_list(t_token *head);
+void							print_ast(t_node *root);
 
 #endif

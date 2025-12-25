@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/24 00:43:02 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/24 00:55:06 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/25 18:06:45 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void	init_buffers(t_val_full_init *val_init, t_segment *seg, t_gc *gc)
 
 void	extract_leading_value(t_val_full_init *val_init, t_segment *seg)
 {
-	while (seg->str[val_init->i] != '$')
+	while (seg->str[val_init->i] && seg->str[val_init->i] != '$')
 		val_init->leading_val[val_init->j++] = seg->str[val_init->i++];
 	val_init->leading_val[val_init->j] = '\0';
 	val_init->j = 0;
