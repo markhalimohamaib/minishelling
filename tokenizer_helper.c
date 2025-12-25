@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/11 18:58:15 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/24 23:59:21 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/25 19:31:12 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,13 +39,14 @@ void	handle_operator(char *str, t_token **head, int *i, t_gc *gc)
 		process_redir_target(token, str, i, gc);
 }
 
-t_token	*tokenize_input(char *str, t_gc *gc)
+t_token	*tokenize_input(char *str, t_gc *gc, t_env **env)
 {
 	t_token	*head;
 	int		i;
 
 	head = NULL;
 	i = 0;
+	gc->envf = env;
 	while (str[i])
 	{
 		while (str[i] == ' ' || str[i] == '\t')
@@ -91,8 +92,8 @@ int	word_len(char *str, int i)
 	count = 0;
 	while (str[i] == ' ' || str[i] == '\t')
 		i++;
-	while (str[i] && str[i] != ' ' && str[i] != '\t'
-		&& str[i] != '|' && str[i] != '>' && str[i] != '<')
+	while (str[i] && str[i] != ' ' && str[i] != '\t' && str[i] != '|'
+		&& str[i] != '>' && str[i] != '<')
 	{
 		if (str[i] == '\'' || str[i] == '\"')
 			count += word_len_in_quotes(str, &i);
@@ -105,10 +106,27 @@ int	word_len(char *str, int i)
 	return (count);
 }
 
+static void	handle_expan_file(t_token *token, char *target, t_gc *gc)
+{
+	t_segment	*file_seg;
+	int			j;
+	
+	j = 0;
+	file_seg = gc_malloc(sizeof(t_segment), gc);
+	token->filename = target;
+	file_seg = filename_seg(token, gc);
+	token->filename = gc_ft_strdup("\0", gc);
+	while (file_seg[j].str)
+	{
+		token->filename = gc_ft_strjoin(token->filename, check_for_filename(file_seg[j], gc->envf, gc), gc);
+		j++;
+	}
+}
+
 void	process_redir_target(t_token *token, char *str, int *i, t_gc *gc)
 {
-	int		size;
-	char	*target;
+	int			size;
+	char		*target;
 
 	token->herdoc_expand = 1;
 	size = word_len(str, (*i));
@@ -116,9 +134,10 @@ void	process_redir_target(t_token *token, char *str, int *i, t_gc *gc)
 	if ((target[0] == '\'' && target[ft_strlen(target) - 1] == '\'')
 		|| (target[0] == '"' && target[ft_strlen(target) - 1] == '"'))
 		token->herdoc_expand = 0;
-	target = remove_quotes_and_track(token, target, size, gc);
 	if (token->type == T_HEREDOC)
-		token->heredoc_del = target;
+		token->heredoc_del = remove_quotes_and_track(token, target, size, gc);
+	else if(ft_strchr(target, '$'))
+		handle_expan_file(token, target, gc);
 	else
-		token->filename = target;
+		token->filename = remove_quotes_and_track(token, target, size, gc);
 }

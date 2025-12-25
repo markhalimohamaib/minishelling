@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   segment_build.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/30 22:16:00 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/11 19:11:53 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/25 17:00:28 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ char	*read_unquoted(char *origin, int *i, t_gc *gc)
 	return (str);
 }
 
-static void	set_segment(t_segment *seg, char *str, t_token_state state,
+void	set_segment(t_segment *seg, char *str, t_token_state state,
 		int expands)
 {
 	seg->str = str;

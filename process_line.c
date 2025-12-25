@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   process_line.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/24 14:45:17 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/24 14:46:47 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/25 17:30:20 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,10 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 		set_exit_status(env, 2, exit_str);
 		return ;
 	}
-	tokens = tokenize_input(line, gc);
+	tokens = tokenize_input(line, gc, env);
+	print_token_list(tokens);
 	ast = parse_pipeline(&tokens, env, gc);
+	print_ast(ast);
 	if (prep_heredoc(ast, exit_str, env, gc))
 		return ;
 	exec_node(ast, exit_str, env, gc);
