@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/24 14:45:17 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/25 17:04:29 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/26 17:12:43 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,9 +67,7 @@ void	process_line(char *line, t_gc *gc, t_env **env)
 		return ;
 	}
 	tokens = tokenize_input(line, gc, env);
-	print_token_list(tokens);
 	ast = parse_pipeline(&tokens, env, gc);
-	print_ast(ast);
 	if (prep_heredoc(ast, exit_str, env, gc))
 		return ;
 	exec_node(ast, exit_str, env, gc);

@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/25 16:36:20 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/25 18:47:45 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/25 22:13:48 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,4 +60,22 @@ char	*check_for_filename(t_segment seg, t_env **env, t_gc *gc)
 		count--;
 	}
 	return (val_init.full_all);
+}
+
+void	handle_expan_file(t_token *token, char *target, t_gc *gc)
+{
+	t_segment	*file_seg;
+	int			j;
+
+	j = 0;
+	file_seg = gc_malloc(sizeof(t_segment), gc);
+	token->filename = target;
+	file_seg = filename_seg(token, gc);
+	token->filename = gc_ft_strdup("\0", gc);
+	while (file_seg[j].str)
+	{
+		token->filename = gc_ft_strjoin(token->filename,
+				check_for_filename(file_seg[j], gc->envf, gc), gc);
+		j++;
+	}
 }

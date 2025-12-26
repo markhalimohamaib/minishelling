@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/25 18:40:38 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/25 22:14:02 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -418,9 +418,7 @@ int								check_pipe_syntax(char *str);
 t_segment						*filename_seg(t_token *token, t_gc *gc);
 char							*check_for_filename(t_segment seg, t_env **env,
 									t_gc *gc);
-
-/* printing.c */
-void							print_token_list(t_token *head);
-void							print_ast(t_node *root);
+void							handle_expan_file(t_token *token, char *target,
+									t_gc *gc);
 
 #endif

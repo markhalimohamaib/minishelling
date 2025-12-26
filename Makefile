@@ -6,7 +6,7 @@
 #    By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/05 00:00:00 by mohamaib          #+#    #+#              #
-#    Updated: 2025/12/25 17:01:34 by mohamaib         ###   ########.fr        #
+#    Updated: 2025/12/26 17:13:02 by mohamaib         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,8 +52,6 @@ SRCS		= main.c \
 			  syntax_checks.c \
 			  syntax_helper.c \
 			  filename_seg.c \
-			  ast_print.c \
-			  token_print.c
 
 BUILTIN_DIR	= builtins
 BUILTIN_SRCS = $(BUILTIN_DIR)/builtin_cd.c \

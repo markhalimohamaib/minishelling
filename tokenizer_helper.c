@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/11 18:58:15 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/25 19:31:12 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/25 22:13:26 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,27 +106,10 @@ int	word_len(char *str, int i)
 	return (count);
 }
 
-static void	handle_expan_file(t_token *token, char *target, t_gc *gc)
-{
-	t_segment	*file_seg;
-	int			j;
-	
-	j = 0;
-	file_seg = gc_malloc(sizeof(t_segment), gc);
-	token->filename = target;
-	file_seg = filename_seg(token, gc);
-	token->filename = gc_ft_strdup("\0", gc);
-	while (file_seg[j].str)
-	{
-		token->filename = gc_ft_strjoin(token->filename, check_for_filename(file_seg[j], gc->envf, gc), gc);
-		j++;
-	}
-}
-
 void	process_redir_target(t_token *token, char *str, int *i, t_gc *gc)
 {
-	int			size;
-	char		*target;
+	int		size;
+	char	*target;
 
 	token->herdoc_expand = 1;
 	size = word_len(str, (*i));
@@ -136,7 +119,7 @@ void	process_redir_target(t_token *token, char *str, int *i, t_gc *gc)
 		token->herdoc_expand = 0;
 	if (token->type == T_HEREDOC)
 		token->heredoc_del = remove_quotes_and_track(token, target, size, gc);
-	else if(ft_strchr(target, '$'))
+	else if (ft_strchr(target, '$'))
 		handle_expan_file(token, target, gc);
 	else
 		token->filename = remove_quotes_and_track(token, target, size, gc);
