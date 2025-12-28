@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/24 01:12:57 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/24 01:21:29 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/28 23:09:09 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@ int	handle_heredoc_line(char *line, t_heredoc_vars *vars)
 {
 	if (g_signal == SIGINT)
 	{
-		rl_event_hook = NULL;
 		if (line)
 			free(line);
 		close(vars->p[1]);
@@ -25,7 +24,6 @@ int	handle_heredoc_line(char *line, t_heredoc_vars *vars)
 	}
 	if (!line)
 	{
-		rl_event_hook = NULL;
 		print_heredoc_warning(vars->delim);
 		close(vars->p[1]);
 		return (1);
@@ -33,7 +31,6 @@ int	handle_heredoc_line(char *line, t_heredoc_vars *vars)
 	if (ft_strcmp(line, vars->delim) == 0)
 	{
 		free(line);
-		rl_event_hook = NULL;
 		close(vars->p[1]);
 		return (1);
 	}
@@ -53,4 +50,32 @@ void	process_heredoc_content(char *line, t_heredoc_vars *here)
 	}
 	else
 		write_raw(line, here->p[1]);
+}
+
+void	heredoc_child(const char *delim, int expand, t_gc *gc, int p[2])
+{
+	char	*line;
+
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
+	close(p[0]);
+	while (1)
+	{
+		line = readline("> ");
+		if (!line)
+		{
+			print_heredoc_warning(delim);
+			exit(0);
+		}
+		if (ft_strcmp(line, delim) == 0)
+		{
+			free(line);
+			exit(0);
+		}
+		if (expand)
+			write_expanded((t_segment){line, NORMAL, 1}, p[1], gc->envf, gc);
+		else
+			write_raw(line, p[1]);
+		free(line);
+	}
 }

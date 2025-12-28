@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/11 17:34:22 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/24 01:27:33 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/28 23:20:39 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,26 +44,27 @@ int	check_heredoc_signal(void)
 	return (0);
 }
 
-int	read_heredoc(const char *delim, int expand, t_env **env, t_gc *gc)
+int	read_heredoc(const char *delim, int expand, t_gc *gc)
 {
-	t_heredoc_vars	here;
-	int				p[2];
-	char			*line;
-	int				status;
+	int		p[2];
+	pid_t	pid;
+	int		status;
 
+	status = 0;
 	if (pipe(p) == -1)
-		return (perror("minishell: pipe"), -1);
-	here = (t_heredoc_vars){p, delim, expand, env, gc};
-	rl_event_hook = check_heredoc_signal;
-	while (1)
+		return (-1);
+	signal(SIGINT, SIG_IGN);
+	pid = fork();
+	if (pid == 0)
+		heredoc_child(delim, expand, gc, p);
+	close(p[1]);
+	waitpid(pid, &status, 0);
+	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
 	{
-		line = readline("> ");
-		status = handle_heredoc_line(line, &here);
-		if (status == -1)
-			return (-1);
-		if (status == 1)
-			return (p[0]);
-		process_heredoc_content(line, &here);
-		free(line);
+		close(p[0]);
+		g_signal = SIGINT;
+		write(1, "\n", 1);
+		return (-1);
 	}
+	return (p[0]);
 }

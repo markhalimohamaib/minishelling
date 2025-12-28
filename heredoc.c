@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/10 10:51:13 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/16 19:38:53 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/28 22:25:53 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int	prepare_heredocs(t_node *n, t_env **env, t_gc *gc)
 		return (0);
 	if (n->type == REDIR_NODE && n->redir_type == T_HEREDOC)
 	{
-		n->heredoc_fd = read_heredoc(n->filename, n->heredoc_expand, env, gc);
+		n->heredoc_fd = read_heredoc(n->filename, n->heredoc_expand, gc);
 		if (n->heredoc_fd == -1)
 			return (-1);
 	}

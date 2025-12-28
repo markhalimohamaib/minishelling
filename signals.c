@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/14 16:46:03 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/25 16:55:17 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/28 23:16:26 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-volatile sig_atomic_t	g_signal = 0;
+int		g_signal = 0;
 
 void	handle_sigint_interactive(int sig)
 {
@@ -32,7 +32,7 @@ void	handle_sigint_exec(int sig)
 void	handle_sigint_heredoc(int sig)
 {
 	g_signal = sig;
-	rl_done = 1;
+	write(STDOUT_FILENO, "\n", 1);
 }
 
 int	get_signal_exit_status(void)

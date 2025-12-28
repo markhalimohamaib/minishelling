@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/17 18:19:34 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/24 00:35:01 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/27 19:57:27 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ void	init_shlvl(t_env **env)
 	{
 		shlvl = ft_atoi_shlvl(shlvl_str);
 		if (shlvl < 0)
-			shlvl = 1;
+			shlvl = 0;
 		else if (shlvl >= 999)
 		{
 			ft_putstr_fd("minishell: warning: shell level (", 2);
