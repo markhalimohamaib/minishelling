@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/23 20:01:26 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/28 21:55:17 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/28 23:42:56 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	setup_signals_interactive(void)
 
 	sigemptyset(&sa_int.sa_mask);
 	sa_int.sa_handler = handle_sigint_interactive;
-	sa_int.sa_flags = SA_RESTART;
+	sa_int.sa_flags = 0;
 	sigaction(SIGINT, &sa_int, NULL);
 	sigemptyset(&sa_quit.sa_mask);
 	sa_quit.sa_handler = SIG_IGN;
