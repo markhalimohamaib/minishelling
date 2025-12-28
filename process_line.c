@@ -38,10 +38,7 @@ static int	prep_heredoc(t_node *ast, char *exit_str, t_env **env, t_gc *gc)
 {
 	int		heredoc_status;
 
-	reset_signal();
-	setup_signals_heredoc();
 	heredoc_status = prepare_heredocs(ast, env, gc);
-	setup_signals_interactive();
 	if (heredoc_status == -1)
 	{
 		cleanup_heredocs(ast);

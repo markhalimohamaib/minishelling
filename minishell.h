@@ -28,8 +28,9 @@
 # include <sys/wait.h>
 # include <termios.h>
 # include <unistd.h>
+# include <sys/ioctl.h>
 
-extern volatile sig_atomic_t	g_signal;
+extern int	g_signal;
 
 typedef struct s_env
 {
@@ -361,7 +362,6 @@ void							print_heredoc_warning(const char *delim);
 void							write_expanded(t_segment seg, int fd,
 									t_env **env, t_gc *gc);
 void							write_raw(char *line, int fd);
-int								check_heredoc_signal(void);
 
 /* read_heredoc_helpers.c */
 int								handle_heredoc_line(char *line,
@@ -372,14 +372,13 @@ void							process_heredoc_content(char *line,
 /* signals.c */
 void							handle_sigint_interactive(int sig);
 void							handle_sigint_exec(int sig);
-void							handle_sigint_heredoc(int sig);
+void							handle_heredoc_sigint(int sig);
 int								get_signal_exit_status(void);
 void							reset_signal(void);
 
 /* setup_signals.c */
 void							setup_signals_interactive(void);
 void							setup_signals_exec(void);
-void							setup_signals_heredoc(void);
 void							setup_signals_child(void);
 
 /* exit_status.c */

@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-volatile sig_atomic_t	g_signal = 0;
+int	g_signal = 0;
 
 void	handle_sigint_interactive(int sig)
 {
@@ -29,10 +29,11 @@ void	handle_sigint_exec(int sig)
 	write(STDOUT_FILENO, "\n", 1);
 }
 
-void	handle_sigint_heredoc(int sig)
+void	handle_heredoc_sigint(int sig)
 {
-	g_signal = sig;
-	rl_done = 1;
+	(void)sig;
+	g_signal = SIGINT;
+	write(STDOUT_FILENO, "\n", 1);
 }
 
 int	get_signal_exit_status(void)

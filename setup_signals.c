@@ -19,7 +19,7 @@ void	setup_signals_interactive(void)
 
 	sigemptyset(&sa_int.sa_mask);
 	sa_int.sa_handler = handle_sigint_interactive;
-	sa_int.sa_flags = SA_RESTART;
+	sa_int.sa_flags = 0;
 	sigaction(SIGINT, &sa_int, NULL);
 	sigemptyset(&sa_quit.sa_mask);
 	sa_quit.sa_handler = SIG_IGN;
@@ -34,21 +34,6 @@ void	setup_signals_exec(void)
 
 	sigemptyset(&sa_int.sa_mask);
 	sa_int.sa_handler = handle_sigint_exec;
-	sa_int.sa_flags = 0;
-	sigaction(SIGINT, &sa_int, NULL);
-	sigemptyset(&sa_quit.sa_mask);
-	sa_quit.sa_handler = SIG_IGN;
-	sa_quit.sa_flags = 0;
-	sigaction(SIGQUIT, &sa_quit, NULL);
-}
-
-void	setup_signals_heredoc(void)
-{
-	struct sigaction	sa_int;
-	struct sigaction	sa_quit;
-
-	sigemptyset(&sa_int.sa_mask);
-	sa_int.sa_handler = handle_sigint_heredoc;
 	sa_int.sa_flags = 0;
 	sigaction(SIGINT, &sa_int, NULL);
 	sigemptyset(&sa_quit.sa_mask);

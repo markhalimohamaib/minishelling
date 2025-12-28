@@ -16,7 +16,6 @@ int	handle_heredoc_line(char *line, t_heredoc_vars *vars)
 {
 	if (g_signal == SIGINT)
 	{
-		rl_event_hook = NULL;
 		if (line)
 			free(line);
 		close(vars->p[1]);
@@ -25,7 +24,6 @@ int	handle_heredoc_line(char *line, t_heredoc_vars *vars)
 	}
 	if (!line)
 	{
-		rl_event_hook = NULL;
 		print_heredoc_warning(vars->delim);
 		close(vars->p[1]);
 		return (1);
@@ -33,7 +31,6 @@ int	handle_heredoc_line(char *line, t_heredoc_vars *vars)
 	if (ft_strcmp(line, vars->delim) == 0)
 	{
 		free(line);
-		rl_event_hook = NULL;
 		close(vars->p[1]);
 		return (1);
 	}
