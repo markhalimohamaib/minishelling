@@ -35,6 +35,8 @@ int	execute_command(t_node *node, t_env **env, t_gc *gc)
 {
 	if (!node || !node->cmd || !node->cmd[0])
 		return (0);
+	if (ft_strchr(node->cmd[0], ' '))
+		node->cmd = gc_ft_split(node->cmd[0], ' ', gc);
 	if (node->builtin != BLT_NONE)
 		return (execute_builtin(node, env, gc));
 	if (node->builtin == BLT_NONE)
