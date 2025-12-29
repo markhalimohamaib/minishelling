@@ -19,7 +19,7 @@ void	setup_signals_interactive(void)
 
 	sigemptyset(&sa_int.sa_mask);
 	sa_int.sa_handler = handle_sigint_interactive;
-	sa_int.sa_flags = SA_RESTART;
+	sa_int.sa_flags = 0;
 	sigaction(SIGINT, &sa_int, NULL);
 	sigemptyset(&sa_quit.sa_mask);
 	sa_quit.sa_handler = SIG_IGN;
