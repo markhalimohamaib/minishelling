@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/09 23:00:16 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/28 22:14:25 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/30 17:07:30 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -257,6 +257,7 @@ int						handle_redir_heredoc(t_node *node, t_env **env,
 char					*env_join_kv(char *key, char *value, t_gc *gc);
 int						env_fill_array(char **arr, t_env *env, t_gc *gc);
 char					**env_to_array(t_env *env, t_gc *gc);
+int						get_full_cnt(t_node *node);
 
 /* segment_build.c */
 char					*read_single_quoted(char *origin, int *i, t_gc *gc);

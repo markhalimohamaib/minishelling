@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 10:29:31 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/25 18:41:00 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/30 17:09:27 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,40 @@ static int	execute_builtin(t_node *node, t_env **env, t_gc *gc)
 	return (0);
 }
 
+char	**handle_exp_spc(t_node *node, t_gc *gc)
+{
+	int		i;
+	int		j;
+	int		w;
+	char	**val;
+	char	**big;
+
+	i = 0;
+	w = 0;
+	big = gc_malloc(sizeof(char *) * (get_full_cnt(node) + 1), gc);
+	while (node->cmd[i])
+	{
+		if (ft_strchr(node->cmd[i], ' '))
+		{
+			val = gc_ft_split(node->cmd[i], ' ', gc);
+			j = 0;
+			while (val[j])
+				big[w++] = gc_ft_strdup(val[j++], gc);
+		}
+		else
+			big[w++] = gc_ft_strdup(node->cmd[i], gc);
+		i++;
+	}
+	big[w] = NULL;
+	return (big);
+}
+
 int	execute_command(t_node *node, t_env **env, t_gc *gc)
 {
 	if (!node || !node->cmd || !node->cmd[0])
 		return (0);
-	if (ft_strchr(node->cmd[0], ' '))
-		node->cmd = gc_ft_split(node->cmd[0], ' ', gc);
+	if (node->builtin == BLT_NONE)
+		node->cmd = handle_exp_spc(node, gc);
 	if (node->builtin != BLT_NONE)
 		return (execute_builtin(node, env, gc));
 	if (node->builtin == BLT_NONE)

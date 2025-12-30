@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils4.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: markhali <markhali@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/23 21:38:07 by mohamaib          #+#    #+#             */
-/*   Updated: 2025/12/25 20:17:12 by markhali         ###   ########.fr       */
+/*   Updated: 2025/12/30 17:12:47 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,4 +78,19 @@ char	**env_to_array(t_env *env, t_gc *gc)
 	if (env_fill_array(arr, env, gc))
 		return (NULL);
 	return (arr);
+}
+
+int	get_full_cnt(t_node *node)
+{
+	int	i;
+	int	size;
+
+	i = 0;
+	size = 0;
+	while (node->cmd[i])
+	{
+		size += countwords(node->cmd[i], ' ');
+		i++;
+	}
+	return (size);
 }
