@@ -6,7 +6,7 @@
 /*   By: mohamaib <mohamaib@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 10:29:31 by markhali          #+#    #+#             */
-/*   Updated: 2025/12/30 17:09:27 by mohamaib         ###   ########.fr       */
+/*   Updated: 2025/12/30 20:26:27 by mohamaib         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,10 @@ int	execute_command(t_node *node, t_env **env, t_gc *gc)
 	if (!node || !node->cmd || !node->cmd[0])
 		return (0);
 	if (node->builtin == BLT_NONE)
+	{
 		node->cmd = handle_exp_spc(node, gc);
+		mark_builtins(node);
+	}
 	if (node->builtin != BLT_NONE)
 		return (execute_builtin(node, env, gc));
 	if (node->builtin == BLT_NONE)
